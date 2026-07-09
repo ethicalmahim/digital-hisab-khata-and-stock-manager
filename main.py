@@ -17,11 +17,10 @@ class App(tk.Tk):
         super().__init__()
         self.title(TITLE)
         self.state('zoomed')
-        # Allows custom styles
+
         style = ttk.Style(self)
         style.theme_use("clam")
 
-        # Configure grid
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
@@ -32,79 +31,56 @@ class App(tk.Tk):
         self.sidebar_frame.grid_columnconfigure(0, weight=1)
 
         # Content area
-        self.content_frame = tk.Frame(self, bg="white")
-        self.content_frame.grid(row=0, column=1, sticky="nsew")
+        self.content_frame = tk.Frame(self)
+        self.content_frame.grid(row=0, column=1, sticky=tk.NSEW)
         self.content_frame.grid_propagate(False)
 
         # Sidebar button style
-        style.configure("Sidebar.TButton",
-                        font=("Arial", 15),
-                        foreground="white",
-                        background="#2c3e50",
-                        borderwidth=0,
-                        relief="solid",
-                        padding=10)
-        style.map("Sidebar.TButton",
-                  background=[("active", "#1a252f")],
-                  relief=[("pressed", "sunken")])
+        style.configure("Sidebar.TButton", font=("Arial", 15), foreground="white", background="#2c3e50", borderwidth=0,
+                        relief="solid", padding=10)
+        style.map("Sidebar.TButton", background=[("active", "#1a252f")], relief=[("pressed", "sunken")])
 
-        # Sidebar buttons
-        ttk.Button(self.sidebar_frame,
-                   text="ড্যাশবোর্ড",
-                   style="Sidebar.TButton",
+        # Sidebar Buttons
+        ttk.Button(self.sidebar_frame, text="ড্যাশবোর্ড", style="Sidebar.TButton",
                    command=lambda: self.show_frame("dashboard")).grid(row=0, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=1, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=1, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="নতুন বিক্রয়",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="নতুন বিক্রয়", style="Sidebar.TButton",
                    command=lambda: self.show_frame("new_sale")).grid(row=2, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=3, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=3, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="বিক্রয়সমূহ",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="বিক্রয়সমূহ", style="Sidebar.TButton",
                    command=lambda: self.show_frame("sales")).grid(row=4, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=5, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=5, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="নতুন ক্রয়",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="নতুন ক্রয়", style="Sidebar.TButton",
                    command=lambda: self.show_frame("new_purchase")).grid(row=6, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=7, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=7, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="ক্রয়সমূহ",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="ক্রয়সমূহ", style="Sidebar.TButton",
                    command=lambda: self.show_frame("purchases")).grid(row=8, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=9, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=9, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="খরচসমূহ",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="খরচসমূহ", style="Sidebar.TButton",
                    command=lambda: self.show_frame("expenses")).grid(row=10, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=11, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=11, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="পণ্যসমূহ",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="পণ্যসমূহ", style="Sidebar.TButton",
                    command=lambda: self.show_frame("products")).grid(row=12, column=0, sticky=tk.EW)
-        ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=13, column=0, sticky=tk.EW)
+        ttk.Separator(self.sidebar_frame, orient=tk.HORIZONTAL).grid(row=13, column=0, sticky=tk.EW)
 
-        ttk.Button(self.sidebar_frame,
-                   text="গ্রাহক",
-                   style="Sidebar.TButton",
+        ttk.Button(self.sidebar_frame, text="গ্রাহক", style="Sidebar.TButton",
                    command=lambda: self.show_frame("customers")).grid(row=14, column=0, sticky=tk.EW)
         ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=15, column=0, sticky=tk.EW)
 
         ttk.Button(self.sidebar_frame,
-                   text="সাপ্লায়ার",
-                   style="Sidebar.TButton",
-                   command=lambda: self.show_frame("suppliers")).grid(row=16, column=0, sticky=tk.EW)
+                   text="সাপ্লায়ার", style="Sidebar.TButton", command=lambda: self.show_frame("suppliers")).grid(row=16,
+                                                                                                                 column=0,
+                                                                                                                 sticky=tk.EW)
         ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=17, column=0, sticky=tk.EW)
 
-        # tk.Label(self.sidebar_frame, text="Developed by EthiSoft", bg="#2c3e50", fg="white", font=("Arial", 11, "bold")).grid(row=16, column=0, pady=(270, 0))
-        # tk.Label(self.sidebar_frame, text="Call: ...", bg="#2c3e50", fg="white", font=("Arial", 11, "bold")).grid(row=17, column=0)
+        tk.Label(self.sidebar_frame, text="Contact: 01722919677", bg="#2c3e50", fg="white", font=("Arial", 11, "bold")).grid(row=18, column=0, pady=(225, 0))
+
         # Frames for content
         self.frames = {}
         for name, frame_class in {

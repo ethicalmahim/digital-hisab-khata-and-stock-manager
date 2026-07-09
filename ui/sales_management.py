@@ -3,11 +3,9 @@ import re
 import tkinter as tk
 from tkinter.font import Font
 from tkinter import ttk, messagebox
-
-from scripts.regsetup import description
 from tkcalendar import DateEntry
 from utils import helpers
-from utils.dbmodels import Invoice, SaleItem
+
 
 # New Sale Frame
 CODE_COL_INDEX = 0

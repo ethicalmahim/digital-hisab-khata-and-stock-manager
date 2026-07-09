@@ -5,8 +5,6 @@ import win32print
 import win32ui
 import textwrap
 
-from utils.dbmodels import Customer
-
 SHOP_NAME = "দোকানের নাম"
 SHOP_ADDRESS_1 = "দোকানের ঠিকানা ১"
 SHOP_ADDRESS_2 = "দোকানের ঠিকানা ২"
@@ -61,7 +59,7 @@ def make_invoice_for_sale(invoice):
             base = base_lines[i] if i < len(base_lines) else ""
             subtotal = money(item.subtotal) if i == 0 else ""
 
-            row = item_name.ljust(ITEM_WIDTH - 1) + qty.ljust(QTY_WIDTH -1) + rate.ljust(RATE_WIDTH + 1) + base.ljust(
+            row = item_name.ljust(ITEM_WIDTH - 1) + qty.ljust(QTY_WIDTH - 1) + rate.ljust(RATE_WIDTH + 1) + base.ljust(
                 BASE_QTY_WIDTH) + subtotal.rjust(SUBTOTAL + 2) + "\n"
 
             ready_invoice += row

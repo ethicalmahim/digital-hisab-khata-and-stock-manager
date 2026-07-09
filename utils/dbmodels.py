@@ -11,8 +11,8 @@ class Base(DeclarativeBase):
 class Product(Base):
     __tablename__ = "products"
     code: Mapped[int] = mapped_column(primary_key=True)
-    category: Mapped[str] = mapped_column(nullable=False)
-    name: Mapped[str] = mapped_column(nullable=False)
+    category: Mapped[str] = mapped_column()
+    name: Mapped[str] = mapped_column()
     base_unit_type: Mapped[str] = mapped_column()
     sell_unit_type: Mapped[str] = mapped_column()
     purchase_rate: Mapped[float] = mapped_column()
@@ -20,7 +20,7 @@ class Product(Base):
     conversion_factor: Mapped[float] = mapped_column()
     pcs_per_box: Mapped[int] = mapped_column()
     current_stock: Mapped[float] = mapped_column(default=0)
-    low_stock_alert: Mapped[float] = mapped_column()
+    low_stock_alert: Mapped[float] = mapped_column(default=0)
 
 
 class Customer(Base):
