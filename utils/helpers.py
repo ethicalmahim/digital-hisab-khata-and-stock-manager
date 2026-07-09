@@ -1,0 +1,343 @@
+import math
+import sqlite3
+import tkinter as tk
+import win32print
+import win32ui
+import textwrap
+
+from utils.dbmodels import Customer
+
+SHOP_NAME = "দোকানের নাম"
+SHOP_ADDRESS_1 = "দোকানের ঠিকানা ১"
+SHOP_ADDRESS_2 = "দোকানের ঠিকানা ২"
+SHOP_ADDRESS_3 = "দোকানের ঠিকানা ৩"
+SHOP_PHONE = "মোবাইল: 01714963360, 01713566434"
+INVOICE_WIDTH = 43
+ITEM_WIDTH = 13
+QTY_WIDTH = 9
+RATE_WIDTH = 7
+BASE_QTY_WIDTH = 4
+SUBTOTAL = 7
+
+
+def make_invoice_for_sale(invoice):
+    def hr():
+        return "-" * INVOICE_WIDTH
+
+    def eq():
+        return "=" * INVOICE_WIDTH
+
+    def money(x):
+        return f"{x:.2f}"
+
+    def wrap(text, width):
+        return textwrap.wrap(str(text), width)
+
+    ready_invoice = "=" * INVOICE_WIDTH + "\n"
+    ready_invoice += f"{SHOP_NAME.center(INVOICE_WIDTH)}\n"
+    ready_invoice += f"{SHOP_ADDRESS_1.center(INVOICE_WIDTH)}\n"
+    ready_invoice += f"{SHOP_ADDRESS_2.center(INVOICE_WIDTH)}\n"
+    ready_invoice += f"{SHOP_ADDRESS_3.center(INVOICE_WIDTH)}\n"
+    ready_invoice += f"{SHOP_PHONE.center(INVOICE_WIDTH)}\n"
+    ready_invoice += f"{"বিক্রয় চালান".center(INVOICE_WIDTH)}\n"
+    ready_invoice += "=" * INVOICE_WIDTH + "\n"
+    ready_invoice += f"{"চালান নং".ljust(INVOICE_WIDTH // 2)}:" + f"{str(invoice.id).rjust((INVOICE_WIDTH // 2))}\n"
+    ready_invoice += f"{"তারিখ".ljust(INVOICE_WIDTH // 2)}:" + f"{invoice.date.strftime('%d-%m-%Y').rjust((INVOICE_WIDTH // 2))}\n"
+    ready_invoice += f"{"সময়".ljust(INVOICE_WIDTH // 2 - 1)}:" + f"{invoice.time.strftime('%I:%M %p').rjust((INVOICE_WIDTH // 2))}\n"
+    ready_invoice += "-" * INVOICE_WIDTH + "\n"
+    ready_invoice += "পণ্যসমূহ".ljust(ITEM_WIDTH) + "পরিমাণ".ljust(QTY_WIDTH) + "দর".ljust(
+        RATE_WIDTH) + "মজুদ পরি:".ljust(BASE_QTY_WIDTH) + "মোট".rjust(SUBTOTAL) + "\n"
+
+    for sl, item in enumerate(invoice.items):
+        name_lines = wrap(item.product_name, ITEM_WIDTH - 1)
+        qty_lines = [str(round(item.quantity, 2)), item.unit_type]
+        base_lines = item.base_qty.split(" ")
+        max_lines = max(len(name_lines), len(qty_lines), len(base_lines), 1)
+
+        for i in range(max_lines):
+            item_name = name_lines[i] if i < len(name_lines) else ""
+            qty = qty_lines[i] if i < len(qty_lines) else ""
+            rate = money(item.unit_price) if i == 0 else ""
+            base = base_lines[i] if i < len(base_lines) else ""
+            subtotal = money(item.subtotal) if i == 0 else ""
+
+            row = item_name.ljust(ITEM_WIDTH - 1) + qty.ljust(QTY_WIDTH -1) + rate.ljust(RATE_WIDTH + 1) + base.ljust(
+                BASE_QTY_WIDTH) + subtotal.rjust(SUBTOTAL + 2) + "\n"
+
+            ready_invoice += row
+
+        ready_invoice += "\n"
+
+    ready_invoice += "-" * INVOICE_WIDTH + "\n"
+    ready_invoice += "সর্বমোট:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.mrp_total}".rjust(
+        INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "(-) ছাড়:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.discount}".rjust(
+        INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += f"{"-" * int(INVOICE_WIDTH // 2 - 1)}".rjust(INVOICE_WIDTH) + "\n"
+    ready_invoice += "মোট প্রদেয়:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.total_payable}".rjust(
+        INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "পরিশোধ:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.paid}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += f"{"-" * int(INVOICE_WIDTH // 2 - 1)}".rjust(INVOICE_WIDTH) + "\n"
+    ready_invoice += "ফেরত:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.change}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "বাকী:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.due}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "-" * INVOICE_WIDTH + "\n\n"
+    ready_invoice += f"গ্রাহকের মোবাইল নম্বর: {invoice.customer.phone}\n"
+    ready_invoice += f"গ্রাহকের নাম: {invoice.customer.name}\n"
+    ready_invoice += f"গ্রাহকের ঠিকানা: {invoice.customer.address}\n"
+    ready_invoice += f"গ্রাহকের ব্যালেন্স: {invoice.customer.balance}\n\n"
+    ready_invoice += "ধন্যবাদ, আবার আসবেন। ".center(INVOICE_WIDTH) + "\n\n"
+    ready_invoice += "   বিঃ দ্রঃ পণ্য ফেরতের জন্য রিসিপ্ট আবশ্যক।".center(INVOICE_WIDTH)
+    print(ready_invoice)
+    return ready_invoice
+
+
+def print_out_invoice(invoice):
+    printer_name = win32print.GetDefaultPrinter()
+
+    hprinter = win32print.OpenPrinter(printer_name)
+    printer_info = win32print.GetPrinter(hprinter, 2)
+
+    hdc = win32ui.CreateDC()
+    hdc.CreatePrinterDC(printer_name)
+
+    # ---- SET FONT ----
+    font = win32ui.CreateFont({
+        "name": "Courier New",
+        "height": 26,
+        "weight": 4000
+    })
+    hdc.SelectObject(font)
+
+    # ---- START PRINT ----
+    hdc.StartDoc("Invoice")
+    hdc.StartPage()
+
+    x = 10
+    y = 10
+    line_height = 24
+
+    for line in invoice.split("\n"):
+        hdc.TextOut(x, y, line)
+        y += line_height
+
+    hdc.EndPage()
+    hdc.EndDoc()
+
+    # ---- CLEANUP ----
+    hdc.DeleteDC()
+    win32print.ClosePrinter(hprinter)
+
+
+def validate_phone_number(phone_number):
+    if phone_number == "":
+        return True
+    return phone_number.isdigit() and len(phone_number) <= 11
+
+
+def is_float(value):
+    if value == "" or value == "-":
+        return True
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
+def is_digit(value):
+    if value == "":
+        return True
+    return value.isdigit()
+
+
+class AutoCompleteEntry(tk.Entry):
+    def __init__(self, master, db_path, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.db_path = db_path
+        self.var = tk.StringVar()
+        self.config(textvariable=self.var)
+
+        self.dropdown = None
+        self.listbox = None
+        self.results = []
+
+        self.var.trace_add("write", self._on_type)
+
+        self.bind("<Down>", self._move_down)
+        self.bind("<Up>", self._move_up)
+        self.bind("<Return>", self._select)
+        self.bind("<Button-1>", self._select)
+        self.bind("<ButtonRelease-1>", self._select)
+        self.bind("<Escape>", lambda e: self._hide())
+
+    # ---------------- CORE ----------------
+
+    def _on_type(self, *args):
+        text = self.var.get().strip()
+
+        # Barcode scanner support
+        if len(text) >= 8 and text.isdigit():
+            self._auto_pick(text)
+            return
+
+        if not text:
+            self._hide()
+            return
+
+        self.results = self._search_db(text)
+        if not self.results:
+            self._hide()
+            return
+
+        self._show()
+
+    def _search_db(self, keyword):
+        con = sqlite3.connect(self.db_path)
+        cur = con.cursor()
+
+        cur.execute("""
+                    SELECT code, name
+                    FROM products
+                    WHERE code LIKE ?
+                       OR name LIKE ? LIMIT 15
+                    """, (f"%{keyword}%", f"%{keyword}%"))
+
+        rows = cur.fetchall()
+        con.close()
+
+        return [f"{code} - {name}" for code, name in rows]
+
+    # ---------------- DROPDOWN ----------------
+
+    def _show(self):
+        self._hide()
+
+        self.dropdown = tk.Toplevel(self)
+        self.dropdown.overrideredirect(True)
+        self.dropdown.attributes("-topmost", True)
+
+        x = self.winfo_rootx()
+        y = self.winfo_rooty() + self.winfo_height()
+        w = self.winfo_width()
+        h = min(200, len(self.results) * 24)
+
+        self.dropdown.geometry(f"{w}x{h}+{x}+{y}")
+
+        self.listbox = tk.Listbox(self.dropdown)
+        self.listbox.pack(fill=tk.BOTH, expand=True)
+
+        for item in self.results:
+            self.listbox.insert(tk.END, item)
+
+        self.listbox.selection_set(0)
+
+        self.listbox.bind("<ButtonRelease-1>", self._select)
+
+    def _hide(self):
+        if self.dropdown:
+            self.dropdown.destroy()
+            self.dropdown = None
+
+    # ---------------- SELECTION ----------------
+
+    def _select(self, event=None):
+        if not self.listbox:
+            return
+
+        selection = self.listbox.curselection()
+        if not selection:
+            return
+
+        index = selection[0]
+        value = self.listbox.get(index)
+
+        self.var.set(value)
+        self._hide()
+        self.icursor(tk.END)
+
+    def _move_down(self, event):
+        if self.listbox:
+            index = self.listbox.curselection()[0]
+            if index < self.listbox.size() - 1:
+                self.listbox.selection_clear(index)
+                self.listbox.selection_set(index + 1)
+                self.listbox.activate(index + 1)
+
+    def _move_up(self, event):
+        if self.listbox:
+            index = self.listbox.curselection()[0]
+            if index > 0:
+                self.listbox.selection_clear(index)
+                self.listbox.selection_set(index - 1)
+                self.listbox.activate(index - 1)
+
+    # ---------------- BARCODE ----------------
+
+    def _auto_pick(self, code):
+        con = sqlite3.connect(self.db_path)
+        cur = con.cursor()
+
+        cur.execute("""
+                    SELECT code, name
+                    FROM products
+                    WHERE code = ?
+                    """, (code,))
+
+        row = cur.fetchone()
+        con.close()
+
+        if row:
+            self.var.set(f"{row[0]} — {row[1]}")
+            self._hide()
+
+
+class AutoCompleteEntryForSuppliers(AutoCompleteEntry):
+    def _search_db(self, keyword):
+        con = sqlite3.connect(self.db_path)
+        cur = con.cursor()
+
+        cur.execute(f"""
+            SELECT name
+            FROM suppliers
+            WHERE name LIKE ?
+        """, (f"%{keyword}%",))
+
+        rows = cur.fetchall()
+        con.close()
+
+        return [name for name in rows]
+
+    def _auto_pick(self, id):
+        con = sqlite3.connect(self.db_path)
+        cur = con.cursor()
+
+        cur.execute("""
+                    SELECT name
+                    FROM suppliers
+                    WHERE id = ?
+                    """, id)
+
+        row = cur.fetchone()
+        con.close()
+
+        if row:
+            self.var.set(f"{row[0]} — {row[1]}")
+            self._hide()
+
+
+def calculate_base_stock_for_tiles(tiles, sft_quantity):
+    size = tiles.name.split(",")[0]  # Taking Tiles size from product's name
+    height, width = size.split("x")  # Taking height and width from tiles
+    sft_per_tiles = round(int(height) * int(width) / 144, 3)  # Taking sft (Using round() for decimal rounding)
+    final_quantity = round(math.ceil(float(sft_quantity) / sft_per_tiles) * sft_per_tiles, 3)
+    pcs_needed = round(final_quantity / sft_per_tiles)
+    box, pcs = divmod(pcs_needed, tiles.pcs_per_box)
+    base_qty = f"{int(box)}B {int(pcs)}P"
+    return final_quantity, base_qty
+
+
+def calculate_base_stock_for_pipe(pipe, ft_quantity):
+    final_quantity = round(int(ft_quantity) / int(pipe.conversion_factor)) * int(pipe.conversion_factor)
+    base_qty = f"{final_quantity // int(pipe.conversion_factor)} {pipe.base_unit_type}"
+    return final_quantity, base_qty
