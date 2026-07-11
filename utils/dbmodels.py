@@ -34,6 +34,7 @@ class Customer(Base):
     purchases = relationship("Invoice", back_populates="customer")
     statements = relationship("CustomerStatement", back_populates="customer")
 
+
 class Supplier(Base):
     __tablename__ = "suppliers"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -94,10 +95,8 @@ class PurchaseRefund(Base):
 class Invoice(Base):
     __tablename__ = "invoices"
     id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[date] = mapped_column(Date, default=lambda: datetime.today().date(),
-                                       nullable=False)
-    time: Mapped[time] = mapped_column(Time, default=lambda: datetime.today().time(),
-                                       nullable=False)
+    date: Mapped[date] = mapped_column(Date, default=lambda: datetime.today().date(), nullable=False)
+    time: Mapped[time] = mapped_column(Time, default=lambda: datetime.today().time(), nullable=False)
     customer_id: Mapped[int] = mapped_column(ForeignKey(Customer.id))
     customer = relationship("Customer", back_populates="purchases")
     mrp_total: Mapped[float] = mapped_column(nullable=False)
@@ -137,7 +136,7 @@ class Refund(Base):
     time: Mapped[time] = mapped_column(Time, default=lambda: datetime.today().time())
     refund_quantity: Mapped[int] = mapped_column(nullable=False)
     refund_amount: Mapped[float] = mapped_column(nullable=False)
-    # RELATION
+
     sale_item = relationship("SaleItem", back_populates="refunds")
 
 
@@ -183,6 +182,7 @@ class CustomerStatement(Base):
     balance: Mapped[float] = mapped_column()
 
     customer = relationship("Customer", back_populates="statements")
+
 
 class SupplierStatement(Base):
     __tablename__ = "supplier_statements"

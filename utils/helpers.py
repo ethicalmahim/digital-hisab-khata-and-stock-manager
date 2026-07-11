@@ -82,10 +82,10 @@ def make_invoice_for_sale(invoice):
     ready_invoice += f"গ্রাহকের মোবাইল নম্বর: {invoice.customer.phone}\n"
     ready_invoice += f"গ্রাহকের নাম: {invoice.customer.name}\n"
     ready_invoice += f"গ্রাহকের ঠিকানা: {invoice.customer.address}\n"
-    ready_invoice += f"গ্রাহকের ব্যালেন্স: {invoice.customer.balance}\n\n"
+    ready_invoice += f"গ্রাহকের ব্যালেন্স: {invoice.customer.balance if invoice.customer.phone != "01700000000" else ""}\n\n"
     ready_invoice += "ধন্যবাদ, আবার আসবেন। ".center(INVOICE_WIDTH) + "\n\n"
     ready_invoice += "   বিঃ দ্রঃ পণ্য ফেরতের জন্য রিসিপ্ট আবশ্যক।".center(INVOICE_WIDTH)
-    print(ready_invoice)
+
     return ready_invoice
 
 

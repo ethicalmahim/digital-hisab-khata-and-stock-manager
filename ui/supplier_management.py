@@ -13,11 +13,12 @@ class SupplierStatementFrame:
         supplier_statement_frame = tk.Frame(parent)
         supplier_statement_frame.grid(row=0, column=0)
 
-        tk.Label(supplier_statement_frame, text=f"সাপ্লায়ারের নাম: {supplier.name}", font=("Arial", 15), ).grid(row=0,
-                                                                                                             column=0,
-                                                                                                             sticky=tk.W)
+        tk.Label(supplier_statement_frame, text=f"সাপ্লায়ারের নাম: {supplier.name}",
+                 font=("Arial", 15), ).grid(row=0, column=0, sticky=tk.W)
+
         tk.Label(supplier_statement_frame, text=f"বর্তমান ব্যালেন্স: {supplier.balance}",
-                 font=("Arial", 15), ).grid(row=1, column=0, sticky=tk.W)
+                 font=("Arial", 15)).grid(row=0, column=1, sticky=tk.W)
+
         columns = ("তারিখ", "সময়", "বিবরণ", "টাকা", "ব্যালেন্স")
         statement_style = ttk.Style(supplier_statement_frame)
         statement_style.configure("Treeview",
@@ -40,13 +41,14 @@ class SupplierStatementFrame:
 
         for col in columns:
             self.statement_treeview.heading(col, text=col)
+
         self.statement_treeview.column("তারিখ", width=120, stretch=False, )
         self.statement_treeview.column("সময়", width=120, stretch=False, )
         self.statement_treeview.column("বিবরণ", width=350, stretch=False, )
         self.statement_treeview.column("টাকা", width=150, stretch=False, )
         self.statement_treeview.column("ব্যালেন্স", width=150, stretch=False, )
 
-        self.statement_treeview.grid(row=2, column=0, columnspan=2, pady=20)
+        self.statement_treeview.grid(row=1, column=0, columnspan=2, pady=20)
 
         scrollbar = ttk.Scrollbar(supplier_statement_frame, orient=tk.VERTICAL,
                                   command=self.statement_treeview.yview)
@@ -71,6 +73,7 @@ class SuppliersFrame(tk.Frame):
 
         columns = ("সাপ্লায়ারের নাম", "ব্যালেন্স")
         self.supplier_details_treeview = ttk.Treeview(self, columns=columns, show="headings", height=21)
+
         for col in columns:
             self.supplier_details_treeview.heading(col, text=col)
 
@@ -202,10 +205,9 @@ class SuppliersFrame(tk.Frame):
         payment_received_entry = tk.Entry(deposit_win, width=10, font=("Segoe UI", 12))
         payment_received_entry.focus_set()
         payment_received_entry.grid(row=2, column=2)
-        tk.Button(deposit_win, text="নিশ্চিত করুন", command=update_supplier_with_new_balance).grid(row=3, column=1,
-                                                                                                   columnspan=2,
-                                                                                                   pady=10,
-                                                                                                   sticky=tk.NSEW)
+        tk.Button(deposit_win, text="নিশ্চিত করুন",
+                  command=update_supplier_with_new_balance).grid(row=3, column=1, columnspan=2, pady=10, sticky=tk.NSEW)
+
         deposit_win.transient()
         deposit_win.grab_set()  # modal behavior
         deposit_win.resizable(False, False)
@@ -229,9 +231,8 @@ class SuppliersFrame(tk.Frame):
         self.supplier_details_treeview.delete(*self.supplier_details_treeview.get_children())
         for i, supplier in enumerate(self.dbmanager.get_all_suppliers()):
             tag = "evenrow" if i % 2 == 0 else "oddrow"
-            self.supplier_details_treeview.insert("", tk.END,
-                                                  values=(supplier.name, supplier.balance),
-                                                  tags=tag)
+            self.supplier_details_treeview.insert("", tk.END, values=(supplier.name, supplier.balance), tags=tag)
+
         self.supplier_name_entry.delete(0, tk.END)
 
     def show_menu(self, event):

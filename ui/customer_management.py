@@ -12,9 +12,8 @@ class CustomerStatementFrame:
         customer_statement_frame = tk.Frame(parent)
         customer_statement_frame.grid(row=0, column=0)
 
-        tk.Label(customer_statement_frame, text=f"গ্রাহকের নাম: {customer.name}", font=("Arial", 15), ).grid(row=0,
-                                                                                                             column=0,
-                                                                                                             sticky=tk.W)
+        tk.Label(customer_statement_frame, text=f"গ্রাহকের নাম: {customer.name}",
+                 font=("Arial", 15)).grid(row=0, column=0, sticky=tk.W)
         tk.Label(customer_statement_frame, text=f"গ্রাহকের মোবাইল: {customer.phone}",
                  font=("Arial", 15), ).grid(row=0, column=1, sticky=tk.W)
         tk.Label(customer_statement_frame, text=f"গ্রাহকের ঠিকানা: {customer.address}",
@@ -75,6 +74,7 @@ class CustomersFrame(tk.Frame):
 
         columns = ("গ্রাহকের নাম", "মোবাইল নম্বর", "ঠিকানা", "ব্যালেন্স")
         self.customer_details_treeview = ttk.Treeview(self, columns=columns, show="headings", height=21)
+
         for col in columns:
             self.customer_details_treeview.heading(col, text=col)
 
@@ -122,8 +122,9 @@ class CustomersFrame(tk.Frame):
                  bg="#2c3e50",
                  fg="white",
                  font=("Segoe UI", 12)).grid(row=3, column=0, padx=5, sticky=tk.NSEW)
-        self.customer_phone_entry = tk.Entry(new_customer_entry_frame, validate="key", validatecommand=(self.register(
-            helpers.is_digit), "%P"), font=("Segoe UI", 12), )
+        self.customer_phone_entry = tk.Entry(new_customer_entry_frame, validate="key",
+                                             validatecommand=(self.register(helpers.validate_phone_number), "%P"),
+                                             font=("Segoe UI", 12))
         self.customer_phone_entry.grid(row=4, column=0, pady=(0, 10), padx=5, sticky=tk.EW)
 
         tk.Label(new_customer_entry_frame,
@@ -201,7 +202,7 @@ class CustomersFrame(tk.Frame):
         deposit_win.title("ব্যালেন্স জমা")
         deposit_win.config(padx=20, pady=20)
 
-        self.center_window(deposit_win, 215, 290)
+        self.center_window(deposit_win, 215, 450)
 
         # Invoice No
         tk.Label(deposit_win, text=f"গ্রাহকের নাম", font=("Segoe UI", 12, "bold"),
@@ -235,18 +236,18 @@ class CustomersFrame(tk.Frame):
         tk.Label(deposit_win, text=f"{customer.balance}", fg="red", font=("Segoe UI", 12, "bold"),
                  anchor=tk.W, ).grid(row=3, column=2, sticky=tk.W)
 
-        tk.Label(deposit_win, text="ব্যালেন্স জমা", font=("Segoe UI", 12, "bold"), anchor=tk.W, ).grid(row=4,
-                                                                                                       column=0,
-                                                                                                       sticky=tk.W)
-        tk.Label(deposit_win, text=":", font=("Segoe UI", 12, "bold"), anchor=tk.W, ).grid(row=4, column=1,
-                                                                                           sticky=tk.W)
+        tk.Label(deposit_win, text="ব্যালেন্স জমা",
+                 font=("Segoe UI", 12, "bold"), anchor=tk.W).grid(row=4, column=0, sticky=tk.W)
+        tk.Label(deposit_win, text=":", font=("Segoe UI", 12, "bold"),
+                 anchor=tk.W).grid(row=4, column=1, sticky=tk.W)
+
         payment_received_entry = tk.Entry(deposit_win, width=10, font=("Segoe UI", 12))
         payment_received_entry.focus_set()
         payment_received_entry.grid(row=4, column=2)
-        tk.Button(deposit_win, text="নিশ্চিত করুন", command=update_customer_with_new_balance).grid(row=5, column=1,
-                                                                                                   columnspan=2,
-                                                                                                   pady=10,
-                                                                                                   sticky=tk.NSEW)
+
+        tk.Button(deposit_win, text="নিশ্চিত করুন",
+                  command=update_customer_with_new_balance).grid(row=5, column=1, columnspan=2, pady=10, sticky=tk.NSEW)
+
         deposit_win.transient()
         deposit_win.grab_set()  # modal behavior
         deposit_win.resizable(False, False)
@@ -270,10 +271,10 @@ class CustomersFrame(tk.Frame):
         self.customer_details_treeview.delete(*self.customer_details_treeview.get_children())
         for i, customer in enumerate(self.dbmanager.get_all_customers()):
             tag = "evenrow" if i % 2 == 0 else "oddrow"
+
             self.customer_details_treeview.insert("", tk.END,
                                                   values=(customer.name, customer.phone, customer.address,
-                                                          customer.balance),
-                                                  tags=tag)
+                                                          customer.balance), tags=tag)
         self.customer_name_entry.delete(0, tk.END)
         self.customer_phone_entry.delete(0, tk.END)
         self.customer_address_entry.delete(0, tk.END)

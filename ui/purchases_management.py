@@ -1,11 +1,7 @@
 import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox
-
-from scripts.regsetup import description
 from tkcalendar import DateEntry
-
-from utils.dbmodels import Supplier
 from utils.helpers import AutoCompleteEntry, AutoCompleteEntryForSuppliers
 from tkinter.font import Font
 from utils import helpers
@@ -44,28 +40,21 @@ class NewPurchase(tk.Frame):
         product_selection_frame = tk.Frame(self)
         product_selection_frame.grid(row=0, column=0)
 
-        tk.Label(product_selection_frame, text="পণ্য:", font=("Arial", 15), ).grid(row=0, column=0,
-                                                                                   sticky=tk.W)
-
+        tk.Label(product_selection_frame, text="পণ্য:", font=("Arial", 15), ).grid(row=0, column=0, sticky=tk.W)
         self.product_name_search_entry = AutoCompleteEntry(product_selection_frame, db_path="database/database.db",
-                                                           font=("Arial", 15),
-                                                           width=43)
+                                                           font=("Arial", 15), width=43)
         self.product_name_search_entry.grid(row=0, column=1, sticky=tk.EW)
 
-        tk.Label(product_selection_frame,
-                 text="পরিমাণ:",
-                 font=Font(size=15), ).grid(row=0, column=2)
-
-        self.quantity = tk.Spinbox(product_selection_frame, from_=1, to=100000, font=("Arial", 15), width=7,
-                                   validate="key", validatecommand=(
-                product_selection_frame.register(helpers.is_float),
-                "%P",))
+        tk.Label(product_selection_frame, text="পরিমাণ:", font=Font(size=15), ).grid(row=0, column=2)
+        self.quantity = tk.Spinbox(
+            product_selection_frame, from_=1, to=100000, font=("Arial", 15), width=7,
+            validate="key", validatecommand=(product_selection_frame.register(helpers.is_float), "%P",)
+        )
         self.quantity.grid(row=0, column=3)
 
         ttk.Button(product_selection_frame, text="যোগ করুন", command=self.add_item).grid(row=0, column=4)
 
         ## Lower Part
-
         treeview_style = ttk.Style(product_selection_frame)
         treeview_style.configure("Treeview",
                                  font=("Segoe UI", 12),
@@ -87,14 +76,14 @@ class NewPurchase(tk.Frame):
         for col in columns:
             self.product_entry_treeview.heading(col, text=col)
 
-        self.product_entry_treeview.column("ক্রমিক", width=80, stretch=False, )
+        self.product_entry_treeview.column("ক্রমিক", width=75, stretch=False, )
         self.product_entry_treeview.column("শ্রেণি", width=80, stretch=False, )
-        self.product_entry_treeview.column("পণ্যের নাম", width=300, stretch=False, )
+        self.product_entry_treeview.column("পণ্যের নাম", width=280, stretch=False, )
         self.product_entry_treeview.column("পরিমাণ", width=70, stretch=False, anchor=tk.E)
-        self.product_entry_treeview.column("একক", width=60, stretch=False)
+        self.product_entry_treeview.column("একক", width=55, stretch=False)
         self.product_entry_treeview.column("মজুদ", width=80, stretch=False, anchor=tk.CENTER)
-        self.product_entry_treeview.column("দর", width=60, stretch=False, anchor=tk.CENTER)
-        self.product_entry_treeview.column("মোট", width=85, stretch=False, anchor=tk.CENTER)
+        self.product_entry_treeview.column("দর", width=75, stretch=False, anchor=tk.CENTER)
+        self.product_entry_treeview.column("মোট", width=100, stretch=False, anchor=tk.CENTER)
 
         self.product_entry_treeview.grid(row=1, column=0, columnspan=5, pady=20)
 
@@ -174,7 +163,7 @@ class NewPurchase(tk.Frame):
                  ).grid(row=3, column=1, sticky=tk.NSEW)
 
         self.discount_entry = tk.Entry(purchase_invoice_frame,
-                                       width=6,
+                                       width=11,
                                        highlightbackground="#2c3e50",
                                        highlightthickness=1,
                                        highlightcolor="#2c3e50",
@@ -188,7 +177,7 @@ class NewPurchase(tk.Frame):
                                    validatecommand=(purchase_invoice_frame.register(self.update_total), "%P"))
 
         # Total Payable
-        ttk.Separator(purchase_invoice_frame, orient="horizontal").grid(row=4, column=0, columnspan=3, sticky=tk.EW)
+        ttk.Separator(purchase_invoice_frame, orient=tk.HORIZONTAL).grid(row=4, column=0, columnspan=3, sticky=tk.EW)
         tk.Label(purchase_invoice_frame,
                  text="মোট প্রদেয়",
                  bg="#2c3e50",
@@ -209,9 +198,8 @@ class NewPurchase(tk.Frame):
                  fg="white").grid(row=5, column=2, sticky=tk.NSEW)
 
         # Total Paid + Due-------------------------------------------------------------------------------------
-
         ## Total Paid
-        ttk.Separator(purchase_invoice_frame, orient="horizontal").grid(row=7, column=0, columnspan=3, sticky=tk.EW)
+        ttk.Separator(purchase_invoice_frame, orient=tk.HORIZONTAL).grid(row=7, column=0, columnspan=3, sticky=tk.EW)
         tk.Label(purchase_invoice_frame,
                  text="পরিশোধিত",
                  bg="#2c3e50",
@@ -232,7 +220,7 @@ class NewPurchase(tk.Frame):
         self.paid_amount_entry.grid(row=8, column=2, sticky=tk.NSEW)
         self.paid_amount_entry.insert(0, "0")
         self.paid_amount_entry.config(validate="key",
-                                      validatecommand=(purchase_invoice_frame.register(self.calculate_due), "%P"), )
+                                      validatecommand=(purchase_invoice_frame.register(self.calculate_due), "%P"))
 
         ## Due
         tk.Label(purchase_invoice_frame,
@@ -298,14 +286,23 @@ class NewPurchase(tk.Frame):
             messagebox.showerror("পণ্য নির্বাচন", "অনুগ্রহ করে পণ্য নির্বাচন করুন !")
             return
 
-        product_code = product_name_with_code.split("-")[0].strip()
+        if "-" in product_name_with_code:
+            product_code = product_name_with_code.split("-")[0].strip()
+        else:
+            messagebox.showerror("ভুল পণ্য", "উক্ত পণ্য খুঁজে পাওয়া যায়নি !")
+            return
 
         product = self.dbmanager.get_product_by_code(product_code)
         if not product:
             messagebox.showerror("ভুল পণ্য", "উক্ত পণ্য খুঁজে পাওয়া যায়নি !")
             return
 
-        quantity = float(self.quantity.get())
+        if self.quantity.get():
+            quantity = float(self.quantity.get())
+        else:
+            messagebox.showerror("পরিমাণ নির্ধারণ", "অনুগ্রহ করে পরিমাণ নির্ধারণ করুন !")
+            return
+
         if product.category == "Tiles":
             final_quantity, base_qty = helpers.calculate_base_stock_for_tiles(product, quantity)
             subtotal = float(product.purchase_rate) * final_quantity
@@ -326,9 +323,7 @@ class NewPurchase(tk.Frame):
                       round(product.purchase_rate, 2), round(subtotal, 2))
 
         try:
-            self.product_entry_treeview.insert("", tk.END, iid=product.code,
-                                               values=values,
-                                               tags="product_entry_row")
+            self.product_entry_treeview.insert("", tk.END, iid=product.code, values=values, tags="product_entry_row")
         except tk.TclError:
             messagebox.showinfo("ডুপ্লিকেট পণ্য", f"{product.name} ইতিমধ্যে তালিকায় রয়েছে !")
 
@@ -533,7 +528,7 @@ class NewPurchase(tk.Frame):
             due = round(total_payable - paid_amount, 2)
             self.due.set(due)
         else:
-            self.due.set(0.00)
+            self.due.set(0)
         return True
 
     def show_menu(self, event):
@@ -552,12 +547,11 @@ class RefundFrame:
         product_selection_frame = tk.Frame(parent)
         product_selection_frame.grid(row=1, column=0)
 
-        tk.Label(product_selection_frame, text=f"সাপ্লায়ার: {purchase.supplier.name}",
-                 font=("Arial", 15), ).grid(row=0, column=0)
+        tk.Label(product_selection_frame, text=f"সাপ্লায়ার: {purchase.supplier.name}", font=("Arial", 15)).grid(row=0,
+                                                                                                                column=0)
 
         tk.Label(product_selection_frame, text=f"তারিখ: {purchase.purchase_date.strftime("%d-%m-%Y")}",
-                 font=("Arial", 15), ).grid(
-            row=0, column=1, padx=20)
+                 font=("Arial", 15), ).grid(row=0, column=1, padx=20)
 
         columns = ("ক্রমিক", "পণ্যের নাম", "ক্র. পরিমাণ", "একক", "দর", "ফে. পরিমাণ (পূর্ব)", "ফে. পরিমাণ (নতুন)",
                    "ফে. যোগ্য টাকা")
@@ -583,11 +577,12 @@ class RefundFrame:
 
         for col in columns:
             self.product_entry_treeview.heading(col, text=col)
+
         self.product_entry_treeview.column("ক্রমিক", width=65, stretch=False, )
-        self.product_entry_treeview.column("পণ্যের নাম", width=260, stretch=False, )
+        self.product_entry_treeview.column("পণ্যের নাম", width=250, stretch=False, )
         self.product_entry_treeview.column("ক্র. পরিমাণ", width=100, stretch=False, )
         self.product_entry_treeview.column("একক", width=70, stretch=False)
-        self.product_entry_treeview.column("দর", width=90, stretch=False)
+        self.product_entry_treeview.column("দর", width=100, stretch=False)
         self.product_entry_treeview.column("ফে. পরিমাণ (পূর্ব)", width=155, stretch=False, )
         self.product_entry_treeview.column("ফে. পরিমাণ (নতুন)", width=155, stretch=False, )
         self.product_entry_treeview.column("ফে. যোগ্য টাকা", width=130, stretch=False, )
@@ -597,29 +592,29 @@ class RefundFrame:
         scrollbar = ttk.Scrollbar(product_selection_frame, orient=tk.VERTICAL,
                                   command=self.product_entry_treeview.yview)
         scrollbar.grid(row=1, column=5, sticky=tk.NS, pady=20)
+
         self.product_entry_treeview.configure(yscrollcommand=scrollbar.set)
 
         total_items_frame = tk.Frame(product_selection_frame)
-        total_items_frame.grid(row=2, column=0, columnspan=2, sticky=tk.W)
-
-        total_items_frame = tk.Frame(product_selection_frame)
         total_items_frame.grid(row=2, column=2, columnspan=3, sticky=tk.E)
-        tk.Label(total_items_frame, text="ফেরতযোগ্য মোট টাকা:", font=("Arial", 16, "bold"), ).grid(row=2, column=0,
+        tk.Label(total_items_frame, text="ফেরতযোগ্য মোট টাকা:", font=("Arial", 16, "bold")).grid(row=2, column=0,
                                                                                                    sticky=tk.W)
         self.total_refund_amount = tk.IntVar(value=0)
-        tk.Label(total_items_frame, textvariable=self.total_refund_amount, font=("Arial", 16, "bold"), ).grid(row=2,
+        tk.Label(total_items_frame, textvariable=self.total_refund_amount, font=("Arial", 16, "bold")).grid(row=2,
                                                                                                               column=1,
                                                                                                               sticky=tk.W)
 
         ttk.Button(product_selection_frame, text="নিশ্চিত করুন", command=self.add_refund_and_update_stock).grid(
             row=3, column=4, pady=(40, 0), sticky=tk.E)
+
         self.load_products()
 
     def load_products(self):
         for i, item in enumerate(self.purchase.items):
             tag = "evenrow" if i % 2 == 0 else "oddrow"
             previous_returns_of_this_item = sum([refund.refund_quantity for refund in item.refunds])
-            self.product_entry_treeview.insert("", tk.END, iid=item.id,
+            self.product_entry_treeview.insert("", tk.END,
+                                               iid=item.id,
                                                values=(item.product_code, item.product_name, item.quantity,
                                                        item.unit_type,
                                                        item.unit_price, previous_returns_of_this_item, 0, 0), tags=tag)
@@ -627,8 +622,10 @@ class RefundFrame:
     def edit_cell(self, event):
         # Detect row and column
         region = self.product_entry_treeview.identify("region", event.x, event.y)
+
         if region != "cell":
             return
+
         row_id = self.product_entry_treeview.identify_row(event.y)
         column = self.product_entry_treeview.identify_column(event.x)
 
@@ -658,10 +655,12 @@ class RefundFrame:
                 messagebox.showwarning(title="ফেরত সীমার উর্ধ্বে",
                                        message="ফেরতযোগ্য পরিমাণ বিক্রিত পরিমাণের চেয়ে বেশি হতে পারবে না।")
                 return
+
             values[col_index] = new_val  # Implements Changes
 
             # Update return subtotal
             values[REFUND_AMT_COL_INDEX] = str(float(values[RF_RATE_COL_INDEX]) * float(values[col_index]))
+
             # Update Product in the TreeView
             self.product_entry_treeview.item(row_id, values=values)
 
@@ -674,7 +673,6 @@ class RefundFrame:
             entry.destroy()
 
         entry.bind("<Return>", save_edit)
-        # entry.bind("<FocusOut>", save_edit)
 
     def add_refund_and_update_stock(self):
         for row_id in self.product_entry_treeview.get_children():
@@ -693,6 +691,7 @@ class RefundFrame:
             purchase_item.refunds.append(purchase_refund_history)
 
             self.dbmanager.update_changes()
+
         total_refund = self.total_refund_amount.get()
         self.purchase.supplier.balance += total_refund
         self.purchase.paid += total_refund
@@ -700,7 +699,7 @@ class RefundFrame:
         statement = self.dbmanager.SupplierStatement(supplier_id=self.purchase.supplier_id,
                                                      description=f"পণ্য ফেরত (ক্রয় চালান - {self.purchase.id})",
                                                      amount=self.total_refund_amount.get(),
-                                                     balance=self.purchase.supplier.balance, )
+                                                     balance=self.purchase.supplier.balance)
         self.dbmanager.add_statement(statement)
         self.parent.destroy()
 
@@ -730,7 +729,6 @@ class PurchasesFrame(tk.Frame):
                                                           activebackground="#1abc9c", selectcolor="#1abc9c",
                                                           variable=self.filter_var,
                                                           value="today_delivery", indicatoron=False, height=3)
-
         self.today_delivery_radio_button.grid(row=0, column=1, sticky=tk.NSEW)
 
         self.due_purchases_radio_button = tk.Radiobutton(options_frame, text="বাকী\nক্রয়", width=10,
@@ -740,6 +738,7 @@ class PurchasesFrame(tk.Frame):
                                                          variable=self.filter_var,
                                                          value="due_purchases", indicatoron=False, height=3)
         self.due_purchases_radio_button.grid(row=0, column=2, sticky=tk.NSEW)
+
         self.custom_search_button = tk.Radiobutton(options_frame, text="খুঁজুন", width=10, fg="white",
                                                    bg="#3498db",
                                                    command=self.custom_search, font=("Arial", 15),
@@ -757,7 +756,7 @@ class PurchasesFrame(tk.Frame):
                                      fg="white",
                                      bg="#2c3e50",
                                      width=15,
-                                     font=("Segoe UI", 14), )
+                                     font=("Segoe UI", 14))
         self.search_label.grid(row=0, column=0, columnspan=4, sticky=tk.NSEW)
         self.search_by_label = tk.Label(custom_search, text="খোঁজার মাধ্যম:", font=("Segoe UI", 10), )
         self.search_by_label.grid(row=1, column=0, pady=10, sticky=tk.E)
@@ -770,6 +769,7 @@ class PurchasesFrame(tk.Frame):
                                                       value="by_supplier", command=self.search_by_supplier,
                                                       indicatoron=False)
         self.by_supplier_radiobutton.grid(row=1, column=1, pady=10, sticky=tk.W)
+
         self.by_purchase_date_radiobutton = tk.Radiobutton(custom_search, text="ক্রয়ের তারিখ", fg="white",
                                                            bg="#3498db",
                                                            activeforeground="white", width=12, font=("Segoe UI", 10),
@@ -778,6 +778,7 @@ class PurchasesFrame(tk.Frame):
                                                            value="by_purchase_date",
                                                            command=self.search_by_purchase_date, indicatoron=False)
         self.by_purchase_date_radiobutton.grid(row=1, column=2, pady=10, sticky=tk.W)
+
         self.by_delivery_date_radiobutton = tk.Radiobutton(custom_search, text="ডেলিভারির তারিখ", fg="white",
                                                            bg="#3498db",
                                                            activeforeground="white", width=15, font=("Segoe UI", 10),
@@ -787,13 +788,14 @@ class PurchasesFrame(tk.Frame):
                                                            command=self.search_by_delivery_date,
                                                            indicatoron=False)
         self.by_delivery_date_radiobutton.grid(row=1, column=3, pady=10, padx=(0, 8), sticky=tk.W)
-        self.option_label = tk.Label(custom_search, text="সাপ্লায়ার:", width=15, font=("Segoe UI", 10),
-                                     anchor=tk.E, )
+
+        self.option_label = tk.Label(custom_search, text="সাপ্লায়ার:", width=15, font=("Segoe UI", 10), anchor=tk.E)
         self.option_label.grid(row=2, column=0, pady=(0, 10), padx=(7, 0), sticky=tk.E)
 
         self.supplier_name_entry = AutoCompleteEntryForSuppliers(custom_search, db_path="database/database.db",
                                                                  width=20, font=("Segoe UI", 10), )
         self.supplier_name_entry.grid(row=2, column=1, columnspan=2, pady=(0, 10), sticky=tk.EW)
+
         self.date_entry = DateEntry(
             custom_search,
             date_pattern="dd-mm-yyyy",
@@ -827,6 +829,7 @@ class PurchasesFrame(tk.Frame):
 
         for col in columns:
             self.purchases_treeview.heading(col, text=col)
+
         self.purchases_treeview.column("ক্রমিক", width=90, stretch=False, anchor=tk.W)
         self.purchases_treeview.column("সাপ্লায়ার", width=130, stretch=False, anchor=tk.W)
         self.purchases_treeview.column("ক্রয়ের তারিখ", width=150, stretch=False, anchor=tk.W)
@@ -842,6 +845,7 @@ class PurchasesFrame(tk.Frame):
         sales_treeview_scrollbar = ttk.Scrollbar(self.purchases_treeview_frame, orient=tk.VERTICAL,
                                                  command=self.purchases_treeview.yview)
         sales_treeview_scrollbar.grid(row=0, column=1, pady=20, sticky=tk.NS)
+
         self.purchases_treeview.configure(yscrollcommand=sales_treeview_scrollbar.set)
         self.purchases_treeview.bind("<Button-3>", self.show_menu)
 
@@ -885,13 +889,16 @@ class PurchasesFrame(tk.Frame):
                 self.purchases_treeview.delete(*self.purchases_treeview.get_children())
                 messagebox.showerror(title="পাওয়া যায়নি", message="উক্ত সাপ্লায়ারের ক্রয়ের অর্ডার পাওয়া যায়নি")
                 return
+
             self.insert_purchases_to_treeview(purchases)
 
         elif filter_option == "by_purchase_date":
             date = self.date_entry.get()
             day, month, year = date.split("-")
             delivery_date_obj = datetime.date(day=int(day), month=int(month), year=int(year))
+
             purchases = self.dbmanager.get_purchases_by_purchase_date(delivery_date_obj)
+
             if not purchases:
                 self.purchases_treeview.delete(*self.purchases_treeview.get_children())
                 messagebox.showerror(title="পাওয়া যায়নি", message="উক্ত তারিখের কোন ক্রয় পাওয়া যায়নি !")
@@ -902,11 +909,14 @@ class PurchasesFrame(tk.Frame):
             date = self.date_entry.get()
             day, month, year = date.split("-")
             delivery_date_obj = datetime.date(day=int(day), month=int(month), year=int(year))
+
             purchases = self.dbmanager.get_purchases_by_delivery_date(delivery_date_obj)
+
             if not purchases:
                 self.purchases_treeview.delete(*self.purchases_treeview.get_children())
                 messagebox.showerror(title="পাওয়া যায়নি", message="উক্ত ডেলিভারি তারিখের কোন ক্রয় পাওয়া যায়নি !")
                 return
+
             self.insert_purchases_to_treeview(purchases)
 
     # Filter Option Helper Methods--------------------------------------------------------------------------------------
@@ -924,6 +934,7 @@ class PurchasesFrame(tk.Frame):
 
     def insert_purchases_to_treeview(self, purchases):
         self.purchases_treeview.delete(*self.purchases_treeview.get_children())
+
         for i, purchase in enumerate(purchases[::-1]):
             tag = "evenrow" if i % 2 == 0 else "oddrow"
             self.purchases_treeview.insert(
@@ -996,6 +1007,7 @@ class PurchasesFrame(tk.Frame):
         scrollbar = ttk.Scrollbar(purchased_products_toplevel, orient=tk.VERTICAL,
                                   command=purchased_products_list_treeview.yview)
         scrollbar.grid(row=0, column=1, sticky=tk.NS, padx=(0, 20), pady=20)
+
         purchased_products_list_treeview.configure(yscrollcommand=scrollbar.set)
 
         purchase_id = self.purchases_treeview.selection()[0]
@@ -1109,6 +1121,7 @@ class PurchasesFrame(tk.Frame):
         selected_purchase_iid = self.purchases_treeview.selection()[0]
         purchase_id = self.purchases_treeview.item(selected_purchase_iid, "values")[0]
         purhcase = self.dbmanager.get_purchase_by_id(purchase_id)
+
         if purhcase.status == "গৃহীত":
             purchase_return_window = tk.Toplevel(self.purchases_treeview_frame)
             purchase_return_window.title("পণ্য ফেরত")

@@ -4,6 +4,9 @@ from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
 from utils import helpers
 
+EXPENSES_PURPOSE_COL_INDEX = 2
+EXPENSES_AMOUNT_COL_INDEX = 3
+
 
 class ExpensesFrame(tk.Frame):
     def __init__(self, parent, dbmanager):
@@ -64,8 +67,7 @@ class ExpensesFrame(tk.Frame):
                                                   indicatoron=False)
         self.by_date_radiobutton.grid(row=1, column=1, pady=10, sticky=tk.EW)
 
-        self.option_label = tk.Label(custom_search, text="তারিখ:", width=13, font=("Segoe UI", 10),
-                                     anchor=tk.E, )
+        self.option_label = tk.Label(custom_search, text="তারিখ:", width=13, font=("Segoe UI", 10), anchor=tk.E)
         self.option_label.grid(row=2, column=0, pady=(0, 10), padx=(7, 0), sticky=tk.E)
 
         self.date_entry = DateEntry(
@@ -106,13 +108,14 @@ class ExpensesFrame(tk.Frame):
                  bg="#2c3e50",
                  fg="white",
                  font=("Segoe UI", 12)).grid(row=3, column=0, padx=5, sticky=tk.NSEW)
-        self.amount_entry = tk.Entry(new_expense_entry_frame, validate="key", validatecommand=(self.register(
-            helpers.is_digit), "%P"), font=("Segoe UI", 12), )
+        self.amount_entry = tk.Entry(new_expense_entry_frame,
+                                     validate="key",
+                                     validatecommand=(self.register(helpers.is_digit), "%P"), font=("Segoe UI", 12))
         self.amount_entry.grid(row=4, column=0, pady=(0, 10), padx=5, sticky=tk.EW)
 
-        ttk.Button(new_expense_entry_frame,
-                   text="যোগ করুন", command=self.add_new_expense,
-                   ).grid(row=5, column=0, padx=5, pady=(0, 10), sticky=tk.NSEW)
+        ttk.Button(
+            new_expense_entry_frame,
+            text="যোগ করুন", command=self.add_new_expense).grid(row=5, column=0, padx=5, pady=(0, 10), sticky=tk.NSEW)
 
         # Expenses Frame----------------------------------------------------------------------------------
         self.expenses_treeview_frame = tk.Frame(self)
@@ -120,13 +123,14 @@ class ExpensesFrame(tk.Frame):
 
         self.menu = tk.Menu(self, tearoff=0)
         self.menu.add_command(label="রিফ্রেশ", command=self.refresh)
+        self.menu.add_command(label="মুছুন", command=self.delete_expense)
 
         columns = ("তারিখ", "সময়", "খরচের খাত", "টাকা",)
-        self.expenses_treeview = ttk.Treeview(self.expenses_treeview_frame, columns=columns, show="headings",
-                                              height=16)
+        self.expenses_treeview = ttk.Treeview(self.expenses_treeview_frame, columns=columns, show="headings", height=16)
 
         for col in columns:
             self.expenses_treeview.heading(col, text=col)
+
         self.expenses_treeview.column("তারিখ", width=150, stretch=False, anchor=tk.W)
         self.expenses_treeview.column("সময়", width=180, stretch=False, anchor=tk.W)
         self.expenses_treeview.column("খরচের খাত", width=350, stretch=False, anchor=tk.W)
@@ -135,11 +139,13 @@ class ExpensesFrame(tk.Frame):
         self.expenses_treeview.tag_configure("oddrow", background="#FFFFFF")
         self.expenses_treeview.grid(row=0, column=0, padx=(20, 0), pady=20, sticky=tk.N)
 
-        sales_treeview_scrollbar = ttk.Scrollbar(self.expenses_treeview_frame, orient=tk.VERTICAL,
+        sales_treeview_scrollbar = ttk.Scrollbar(self.expenses_treeview_frame,
+                                                 orient=tk.VERTICAL,
                                                  command=self.expenses_treeview.yview)
         sales_treeview_scrollbar.grid(row=0, column=1, pady=20, sticky=tk.NS)
         self.expenses_treeview.configure(yscrollcommand=sales_treeview_scrollbar.set)
         self.expenses_treeview.bind("<Button-3>", self.show_menu)
+        self.expenses_treeview.bind("<Double-1>", self.edit_product)
 
         self.all_expenses_radio_button.invoke()
 
@@ -152,12 +158,14 @@ class ExpensesFrame(tk.Frame):
     def add_new_expense(self):
         purpose = self.purpose_entry.get()
         amount = self.amount_entry.get()
+
         if not all([purpose, amount]):
             messagebox.showerror(
                 title="অসম্পূর্ণ তথ্য",
                 message="খরচের খাত ও টাকার পরিমাণ পূরণ করতে হবে !"
             )
             return
+
         new_expense = self.dbmanager.Expense(purpose=purpose, amount=amount)
         self.dbmanager.add_new_expense(new_expense)
         self.refresh()
@@ -216,6 +224,65 @@ class ExpensesFrame(tk.Frame):
             return
 
         self.insert_expenses_to_treeview(expenses)
+
+    def edit_product(self, event):
+        # Detect row and column
+        region = self.expenses_treeview.identify("region", event.x, event.y)
+
+        if region != "cell":
+            return
+
+        row_id = self.expenses_treeview.identify_row(event.y)
+        column = self.expenses_treeview.identify_column(event.x)
+
+        # Column index
+        col_index = int(column.replace("#", "")) - 1
+
+        if col_index != EXPENSES_PURPOSE_COL_INDEX:
+            if col_index != EXPENSES_AMOUNT_COL_INDEX:
+                return
+
+        x, y, width, height = self.expenses_treeview.bbox(row_id, column)
+
+        # Current value
+        value = self.expenses_treeview.item(row_id)["values"][col_index]
+
+        # Overlay Entry widget
+        entry = tk.Entry(self.expenses_treeview, font=("Segoe UI", 12))
+
+        entry.place(x=x, y=y, width=width, height=height)
+        entry.insert(0, value)
+        entry.focus()
+
+        def save_edit():
+            # Editable columns only
+            column_map = {
+                2: "purpose",
+                3: "amount",
+            }
+
+            new_val = entry.get()
+            values = list(self.expenses_treeview.item(row_id, "values"))
+
+            values[col_index] = new_val
+
+            entry.destroy()
+            # Update product in the database
+            self.dbmanager.update_expense(expense_id=row_id,
+                                          changed_column=column_map[col_index],
+                                          new_value=values[col_index])
+
+            # Update Product in the TreeView
+            self.expenses_treeview.item(row_id, values=values)
+
+        entry.bind("<Return>", lambda e: save_edit())
+
+    def delete_expense(self):
+        expense_id = self.expenses_treeview.selection()[0]
+        expense_obj = self.dbmanager.get_expense_by_id(expense_id)
+        self.dbmanager.delete_obj(expense_obj)
+        self.refresh()
+        messagebox.showinfo(title="সফল", message="খরচটি সফলভাবে মুছা হয়েছে !")
 
     def insert_expenses_to_treeview(self, expenses):
         self.expenses_treeview.delete(*self.expenses_treeview.get_children())

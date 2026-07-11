@@ -1,7 +1,5 @@
-import math
-from datetime import date, time, datetime
-from sqlalchemy import create_engine, select, ForeignKey, Date, Time
-from sqlalchemy.orm import DeclarativeBase, Session, Mapped, mapped_column, relationship
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session
 from utils.dbmodels import *
 
 # ------------------------------------------ Engine + Session ------------------------------------------
@@ -10,15 +8,15 @@ Base.metadata.create_all(engine)
 session = Session(engine)
 
 
-# walk_in_customer = Customer(name="Walk In Customer", phone="01700000000", address="Walk In Customer")
-# session.add(walk_in_customer)
-# session.commit()
-#
+# Add Walk-in Customer Initially
+walk_in_customer = Customer(name="Walk-in Customer", phone="01700000000", address="Local")
+session.add(walk_in_customer)
+session.commit()
+
 
 # ------------------------------------------Functions------------------------------------------
 # Product Management
 def get_product_by_name(product_name):
-    """Gets a specific product using product_name"""
     product = session.execute(select(Product).where(Product.name == product_name)).scalar()
     return product
 
@@ -84,6 +82,11 @@ def add_sale(purchase):
     session.commit()
 
 
+def delete_invoice(invoice):
+    session.delete(invoice)
+    session.commit()
+
+
 def get_today_sales():
     today = datetime.today().date()
     today_sales = session.execute(select(Invoice).where(Invoice.date == today)).scalars().all()
@@ -120,7 +123,6 @@ def delete_saleitem(saleitem):
 
 
 # Purchase Management
-
 def add_purchase(purchase):
     session.add(purchase)
     session.commit()
@@ -174,7 +176,7 @@ def get_supplier_by_name(name):
     return supplier
 
 
-# Supplier Management
+
 def get_all_suppliers():
     suppliers = session.execute(select(Supplier)).scalars().all()
     return suppliers
@@ -202,8 +204,19 @@ def get_expenses_by_date(date_obj):
     return expenses
 
 
+def get_expense_by_id(expense_id):
+    expense = session.get(Expense, expense_id)
+    return expense
+
+
 def add_new_expense(new_expense):
     session.add(new_expense)
+    session.commit()
+
+
+def update_expense(expense_id, changed_column, new_value):
+    expense_to_update = session.get(Expense, expense_id)
+    expense_to_update.__setattr__(changed_column, new_value)
     session.commit()
 
 
@@ -253,4 +266,10 @@ def today_expenses():
 
 def add_statement(statement):
     session.add(statement)
+    session.commit()
+
+
+# Common Functions
+def delete_obj(obj):
+    session.delete(obj)
     session.commit()

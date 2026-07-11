@@ -107,7 +107,7 @@ class DashboardFrame(tk.Frame):
                  font=("Arial", 18, "bold"), ).grid(row=0, column=0)
         tk.Label(today_profit, textvariable=self.today_profit, bg="#2c3e50", fg="white",
                  font=("Arial", 18, "bold"), ).grid(row=1, column=0)
-        ttk.Separator(self, orient="horizontal").grid(row=1, column=0, pady=(0, 10), sticky=tk.EW)
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(row=1, column=0, pady=(0, 10), sticky=tk.EW)
 
         # Business Data ---------------------------------------------------------------------------------------------------
         business_data = tk.Frame(self)

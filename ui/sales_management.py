@@ -6,7 +6,6 @@ from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
 from utils import helpers
 
-
 # New Sale Frame
 CODE_COL_INDEX = 0
 CATEGORY_COL_INDEX = 1
@@ -37,23 +36,18 @@ class NewSaleFrame(tk.Frame):
         product_selection_frame = tk.Frame(self)
         product_selection_frame.grid(row=0, column=0)
 
-        tk.Label(product_selection_frame,
-                 text="পণ্য:",
-                 font=("Arial", 15), ).grid(row=0, column=0, sticky=tk.W)
+        tk.Label(product_selection_frame, text="পণ্য:", font=("Arial", 15), ).grid(row=0, column=0, sticky=tk.W)
 
         self.product_name_search_entry = helpers.AutoCompleteEntry(product_selection_frame,
                                                                    db_path="database/database.db", font=("Arial", 15),
                                                                    width=43)
         self.product_name_search_entry.grid(row=0, column=1)
 
-        tk.Label(product_selection_frame,
-                 text="পরিমাণ:",
-                 font=Font(size=15), ).grid(row=0, column=2)
+        tk.Label(product_selection_frame, text="পরিমাণ:", font=Font(size=15), ).grid(row=0, column=2)
 
         self.quantity = tk.Spinbox(product_selection_frame, from_=1, to=100000, font=("Arial", 15), width=7,
-                                   validate="key", validatecommand=(
-                product_selection_frame.register(helpers.is_float),
-                "%P",))
+                                   validate="key",
+                                   validatecommand=(product_selection_frame.register(helpers.is_float), "%P",))
         self.quantity.grid(row=0, column=3)
 
         ttk.Button(product_selection_frame, text="যোগ করুন", command=self.add_item).grid(row=0, column=4)
@@ -70,7 +64,7 @@ class NewSaleFrame(tk.Frame):
                                  foreground="black",
                                  font=("Segoe UI", 12, "bold"))
 
-        columns = ("ক্রমিক", "শ্রেণি", "পণ্যের নাম", "পরিমাণ", "একক", "মজুদ পরিমাণ", "দর", "মোট")
+        columns = ("ক্রমিক", "শ্রেণি", "পণ্যের নাম", "পরিমাণ", "একক", "মজুদ", "দর", "মোট")
         self.product_entry_treeview = ttk.Treeview(product_selection_frame,
                                                    columns=columns,
                                                    show="headings",
@@ -87,14 +81,14 @@ class NewSaleFrame(tk.Frame):
         for col in columns:
             self.product_entry_treeview.heading(col, text=col)
 
-        self.product_entry_treeview.column("ক্রমিক", width=70, stretch=False, )
+        self.product_entry_treeview.column("ক্রমিক", width=75, stretch=False, )
         self.product_entry_treeview.column("শ্রেণি", width=80, stretch=False, )
-        self.product_entry_treeview.column("পণ্যের নাম", width=270, stretch=False, )
+        self.product_entry_treeview.column("পণ্যের নাম", width=280, stretch=False, )
         self.product_entry_treeview.column("পরিমাণ", width=70, stretch=False, anchor=tk.E)
-        self.product_entry_treeview.column("একক", width=60, stretch=False)
-        self.product_entry_treeview.column("মজুদ পরিমাণ", width=115, stretch=False, anchor=tk.CENTER)
-        self.product_entry_treeview.column("দর", width=65, stretch=False, anchor=tk.CENTER)
-        self.product_entry_treeview.column("মোট", width=85, stretch=False, anchor=tk.CENTER)
+        self.product_entry_treeview.column("একক", width=55, stretch=False)
+        self.product_entry_treeview.column("মজুদ", width=80, stretch=False, anchor=tk.CENTER)
+        self.product_entry_treeview.column("দর", width=75, stretch=False, anchor=tk.CENTER)
+        self.product_entry_treeview.column("মোট", width=100, stretch=False, anchor=tk.CENTER)
 
         self.product_entry_treeview.grid(row=1, column=0, columnspan=5, pady=20)
 
@@ -118,7 +112,6 @@ class NewSaleFrame(tk.Frame):
                  anchor=tk.W
                  ).grid(row=0, column=1)
         self.total_items = tk.IntVar(value=0)
-
         tk.Label(invoice_frame,
                  textvariable=self.total_items,
                  fg="white",
@@ -165,20 +158,19 @@ class NewSaleFrame(tk.Frame):
                  bg="#2c3e50",
                  font=("Segoe UI", 12),
                  ).grid(row=3, column=1, sticky=tk.NSEW)
-
         self.discount_entry = tk.Entry(invoice_frame,
-                                       width=6,
+                                       width=11,
                                        highlightbackground="#2c3e50",
                                        highlightthickness=1,
                                        highlightcolor="#2c3e50",
                                        font=("Segoe UI", 12),
-                                       justify=tk.RIGHT, )
+                                       justify=tk.RIGHT)
 
         self.discount_entry.insert(tk.END, "0")
         self.discount_entry.grid(row=3, column=2, sticky=tk.EW)
 
         # Total Payable
-        ttk.Separator(invoice_frame, orient="horizontal").grid(row=4, column=0, columnspan=3, sticky=tk.EW)
+        ttk.Separator(invoice_frame, orient=tk.HORIZONTAL).grid(row=4, column=0, columnspan=3, sticky=tk.EW)
         tk.Label(invoice_frame,
                  text="মোট প্রদেয়",
                  bg="#2c3e50",
@@ -224,8 +216,7 @@ class NewSaleFrame(tk.Frame):
                                    highlightthickness=1,
                                    highlightcolor="#2c3e50",
                                    font=("Segoe UI", 12),
-                                   justify=tk.RIGHT,
-                                   )
+                                   justify=tk.RIGHT)
         self.paid_entry.grid(row=8, column=2, sticky=tk.NSEW)
         self.paid_entry.insert(tk.END, "0")
         self.paid_entry.config(validate="key",
@@ -261,8 +252,7 @@ class NewSaleFrame(tk.Frame):
         tk.Label(invoice_frame,
                  text=":",
                  bg="#2c3e50", font=("Segoe UI", 12),
-                 fg="white").grid(
-            row=10, column=1, sticky=tk.NSEW)
+                 fg="white").grid(row=10, column=1, sticky=tk.NSEW)
         self.due = tk.DoubleVar(value=0)
         tk.Label(invoice_frame,
                  textvariable=self.due,
@@ -281,11 +271,10 @@ class NewSaleFrame(tk.Frame):
                  bg="#2c3e50",
                  font=("Segoe UI", 12), ).grid(row=0, column=0, columnspan=2, sticky=tk.NSEW)
 
-        self.customer_phone_entry = tk.Entry(customer_details_frame, validate="key",
-                                             validatecommand=(
-                                                 customer_details_frame.register(helpers.validate_phone_number),
-                                                 "%P",),
-                                             font=("Segoe UI", 12))
+        self.customer_phone_entry = tk.Entry(
+            customer_details_frame, validate="key",
+            validatecommand=(customer_details_frame.register(helpers.validate_phone_number), "%P",),
+            font=("Segoe UI", 12))
         self.customer_phone_entry.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW)
 
         ttk.Button(customer_details_frame,
@@ -315,7 +304,7 @@ class NewSaleFrame(tk.Frame):
                  fg="white",
                  font=("Segoe UI", 12), ).grid(row=6, column=0, columnspan=3, pady=(10, 0), sticky=tk.NSEW)
         self.customer_balance_entry = tk.Entry(customer_details_frame, state=tk.DISABLED, font=("Segoe UI", 12))
-        self.customer_balance_entry.grid(row=7, column=0, columnspan=3, sticky=tk.EW, )
+        self.customer_balance_entry.grid(row=7, column=0, columnspan=3, sticky=tk.EW)
 
         ttk.Button(customer_details_frame,
                    text="নতুন বিক্রয় তৈরী করুন",
@@ -323,9 +312,8 @@ class NewSaleFrame(tk.Frame):
 
         call_invoice_frame = tk.Frame(invoice_frame)
         call_invoice_frame.grid(row=12, column=0, columnspan=3, pady=(3, 0), sticky=tk.NSEW)
-        tk.Label(call_invoice_frame, text="চালান নং:", fg="white", bg="#2c3e50", font=("Segoe UI", 12)).grid(row=0,
-                                                                                                             column=0,
-                                                                                                             sticky=tk.W)
+        tk.Label(call_invoice_frame, text="চালান নং:", fg="white", bg="#2c3e50",
+                 font=("Segoe UI", 12)).grid(row=0, column=0, sticky=tk.W)
         self.invoice_call_entry = tk.Entry(call_invoice_frame, width=9, validate="key",
                                            validatecommand=(call_invoice_frame.register(helpers.is_digit), "%P",),
                                            font=("Segoe UI", 14))
@@ -333,15 +321,12 @@ class NewSaleFrame(tk.Frame):
 
         ttk.Button(call_invoice_frame, text="কল", command=self.call_invoice).grid(row=0, column=2, sticky=tk.EW)
 
-        ttk.Button(call_invoice_frame, text="চালান আপডেট করুন", command=self.update_invoice).grid(row=1, column=0,
-                                                                                                  columnspan=3,
-                                                                                                  pady=20,
-                                                                                                  sticky=tk.NSEW)
+        ttk.Button(call_invoice_frame, text="চালান আপডেট করুন",
+                   command=self.update_invoice).grid(row=1, column=0, columnspan=3, pady=20, sticky=tk.NSEW)
 
         self.refresh()
 
-        # Main Methods -----------------------------------------------------------------------------------------------------
-
+    # Main Methods -----------------------------------------------------------------------------------------------------
     def add_item(self):
         product_name_with_code = self.product_name_search_entry.get()
 
@@ -386,7 +371,8 @@ class NewSaleFrame(tk.Frame):
                       round(product.sell_unit_price, 2), round(subtotal, 2))
 
         try:
-            self.product_entry_treeview.insert("", tk.END, iid=product.code,
+            self.product_entry_treeview.insert("", tk.END,
+                                               iid=product.code,
                                                values=values,
                                                tags="product_entry_row")
         except tk.TclError:
@@ -400,8 +386,10 @@ class NewSaleFrame(tk.Frame):
     def edit_quantity_and_unit_price(self, event):
         # Detect row and column
         region = self.product_entry_treeview.identify("region", event.x, event.y)
+
         if region != "cell":
             return
+
         row_id = self.product_entry_treeview.identify_row(event.y)
         column = self.product_entry_treeview.identify_column(event.x)
 
@@ -446,6 +434,7 @@ class NewSaleFrame(tk.Frame):
 
             values[SUBTOTAL_COL_INDEX] = str(float(values[QTY_COL_INDEX]) * float(values[RATE_COL_INDEX]))
             self.product_entry_treeview.item(row_id, values=values)
+
             entry.destroy()
             self.update_calculation()
 
@@ -454,6 +443,7 @@ class NewSaleFrame(tk.Frame):
 
     def delete_item(self, items=None):
         selected = items or self.product_entry_treeview.selection()
+
         if not selected:
             return
 
@@ -467,6 +457,7 @@ class NewSaleFrame(tk.Frame):
         # Update Total Items
         total_item = len(self.product_entry_treeview.get_children())
         self.total_items.set(total_item)
+
         # Update MRP Total
         mrp_total_list = [float(self.product_entry_treeview.item(item, "values")[-1]) for item in
                           self.product_entry_treeview.get_children()]
@@ -533,6 +524,9 @@ class NewSaleFrame(tk.Frame):
                 self.customer_phone_entry.config(bg="red")
                 self.customer_name_entry.delete(0, tk.END)
                 self.customer_address_entry.delete("1.0", tk.END)
+                self.customer_balance_entry.config(state=tk.NORMAL)
+                self.customer_balance_entry.delete(0, tk.END)
+                self.customer_balance_entry.config(state=tk.DISABLED)
 
     def make_sale(self):
         if not self.product_entry_treeview.get_children():
@@ -803,7 +797,7 @@ class DuePaymentHistoryFrame:
     def load_payment_history(self):
         for i, payment_history in enumerate(self.invoice.payment_history):
             tag = "evenrow" if i % 2 == 0 else "oddrow"
-            self.payment_history_treeview.insert("", tk.END, values=(payment_history.date,
+            self.payment_history_treeview.insert("", tk.END, values=(payment_history.date.strftime("%d-%m-%Y"),
                                                                      payment_history.time.strftime("%I: %M %p"),
                                                                      payment_history.amount),
                                                  tags=tag)
@@ -1065,6 +1059,7 @@ class SalesFrame(tk.Frame):
 
         self.menu = tk.Menu(self, tearoff=0)
         self.menu.add_command(label="রিফ্রেশ", command=self.refresh)
+        self.menu.add_command(label="চালান মুছুন", command=self.delete_invoice)
         self.menu.add_command(label="বাকী সংগ্রহ", command=self.receive_payment)
         self.menu.add_command(label="বাকী সংগ্রহের বিবরণ", command=self.due_payment_history)
         self.menu.add_command(label="পণ্য ফেরত", command=self.sales_return)
@@ -1147,7 +1142,7 @@ class SalesFrame(tk.Frame):
                 messagebox.showerror(title="পাওয়া যায়নি", message="উক্ত ফোন নম্বরের কোন চালান পাওয়া যায়নি !")
                 return
             purchases_of_the_customer = customer.purchases
-            self.insert_sales_to_treeview(purchases_of_the_customer)
+            self.insert_sales_to_treeview(purchases_of_the_customer[::-1])
 
         elif filter_option == "by_date":
             date = self.date_entry.get()
@@ -1158,7 +1153,7 @@ class SalesFrame(tk.Frame):
                 self.sales_treeview.delete(*self.sales_treeview.get_children())
                 messagebox.showerror(title="পাওয়া যায়নি", message="উক্ত তারিখের কোন চালান পাওয়া যায়নি !")
                 return
-            self.insert_sales_to_treeview(invoices)
+            self.insert_sales_to_treeview(invoices[::-1])
 
     def enable_search_mechanism(self):
         self.search_label.config(fg="white")
@@ -1222,7 +1217,12 @@ class SalesFrame(tk.Frame):
             return
         else:
             def update_invoice_with_new_payment():
+                if not payment_received_entry.get():
+                    messagebox.showerror(title="অসম্পূর্ণ তথ্য", message="অনুগ্রহ করে টাকার পরিমাণ প্রদান করুন !")
+                    return
+
                 received_amount = float(payment_received_entry.get())
+
                 if received_amount > invoice.due:
                     messagebox.showinfo(title="অতিরিক্ত টাকা",
                                         message="প্রাপ্ত টাকা বাকী পাওনার চেয়ে অতিরিক্ত। যাচাই করে আবার চেষ্টা করুন !")
@@ -1247,7 +1247,7 @@ class SalesFrame(tk.Frame):
             payment_win.title("বাকী সংগ্রহ")
             payment_win.config(padx=20, pady=20)
 
-            self.center_window(payment_win, 215, 290)
+            self.center_window(payment_win, 215, 245)
 
             invoice_id = selected_invoice[0]
             invoice = self.dbmanager.get_invoice(invoice_id)
@@ -1298,6 +1298,28 @@ class SalesFrame(tk.Frame):
             payment_win.transient()
             payment_win.grab_set()  # modal behavior
             payment_win.resizable(False, False)
+
+    def delete_invoice(self):
+        selected_invoice_iid = self.sales_treeview.selection()[0]
+        invoice_id = self.sales_treeview.item(selected_invoice_iid, "values")[0]
+        invoice = self.dbmanager.get_invoice(invoice_id)
+
+        # Check if the invoice has return or not.
+        for saleitem in invoice.items:
+            for refund in saleitem.refunds:
+                if refund:
+                    messagebox.showinfo(title="ত্রুটি", message="দুঃখিত, উক্ত চালানটি মুছা সম্ভব নয় !")
+                    return
+
+        # Restore Stocks
+        for item in invoice.items:
+            self.dbmanager.update_stock_of_product(item.product_code, item.quantity)
+            self.dbmanager.delete_saleitem(item)
+
+        self.dbmanager.delete_invoice(invoice)
+        self.refresh()
+        messagebox.showinfo(title="সফল", message="চালানটি সফলভাবে মুছা হয়েছে !")
+
 
     def due_payment_history(self):
         selected_invoice_iid = self.sales_treeview.selection()[0]
