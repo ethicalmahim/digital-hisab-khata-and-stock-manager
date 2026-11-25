@@ -8,10 +8,11 @@ Base.metadata.create_all(engine)
 session = Session(engine)
 
 
-# Add Walk-in Customer Initially
-# walk_in_customer = Customer(name="Walk-in Customer", phone="01700000000", address="Local")
-# session.add(walk_in_customer)
-# session.commit()
+# Add Walk-in Customer Initially (sales without a customer phone are recorded against it)
+WALK_IN_CUSTOMER_PHONE = "01700000000"
+if session.execute(select(Customer).where(Customer.phone == WALK_IN_CUSTOMER_PHONE)).scalar() is None:
+    session.add(Customer(name="Walk-in Customer", phone=WALK_IN_CUSTOMER_PHONE, address="Local"))
+    session.commit()
 
 
 # ------------------------------------------Functions------------------------------------------

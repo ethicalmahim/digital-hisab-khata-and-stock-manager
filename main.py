@@ -79,7 +79,6 @@ class App(tk.Tk):
                                                                                                                  sticky=tk.EW)
         ttk.Separator(self.sidebar_frame, orient="horizontal").grid(row=17, column=0, sticky=tk.EW)
 
-        tk.Label(self.sidebar_frame, text="Contact: 01722919677", bg="#2c3e50", fg="white", font=("Arial", 11, "bold")).grid(row=18, column=0, pady=(225, 0))
 
         # Frames for content
         self.frames = {}
