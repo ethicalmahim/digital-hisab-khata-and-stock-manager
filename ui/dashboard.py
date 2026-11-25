@@ -169,7 +169,7 @@ class DashboardFrame(tk.Frame):
         for today_sale in today_sales:
             today_sales_value += today_sale.total_payable
 
-        return today_sales_value
+        return round(today_sales_value, 2)
 
     def get_today_due_received(self):
         today_due_received_obj = self.dbmanager.today_due_received()
@@ -177,7 +177,7 @@ class DashboardFrame(tk.Frame):
         for obj in today_due_received_obj:
             received_due_payment += obj.amount
 
-        return received_due_payment
+        return round(received_due_payment, 2)
 
     def get_today_due_sales_value(self):
         today_due_sales_value = 0
@@ -185,14 +185,14 @@ class DashboardFrame(tk.Frame):
         for today_sale in today_sales:
             today_due_sales_value += today_sale.due
 
-        return today_due_sales_value
+        return round(today_due_sales_value, 2)
 
     def get_today_sales_return_value(self):
         refund_amount = 0
         today_sales_returns = self.dbmanager.today_sales_returns()
         for sales_return in today_sales_returns:
             refund_amount += sales_return.refund_amount
-        return refund_amount
+        return round(refund_amount, 2)
 
     def get_today_purchases_value(self):
         purchases_value = 0
@@ -200,7 +200,7 @@ class DashboardFrame(tk.Frame):
         for today_purchase in today_purchases:
             purchases_value += today_purchase.paid
 
-        return purchases_value
+        return round(purchases_value, 2)
 
     def get_today_supplier_due_payment(self):
         today_paid = 0
@@ -208,7 +208,7 @@ class DashboardFrame(tk.Frame):
         for today_payment in today_payments:
             today_paid += today_payment.amount
 
-        return today_paid
+        return round(today_paid, 2)
 
     def get_today_expenses_value(self):
         today_expenses_amount = 0
@@ -216,7 +216,7 @@ class DashboardFrame(tk.Frame):
         for today_expense in today_expenses_obj:
             today_expenses_amount += today_expense.amount
 
-        return today_expenses_amount
+        return round(today_expenses_amount, 2)
 
     def get_total_products_valuation(self):
         products_valuation = 0

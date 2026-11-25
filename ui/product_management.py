@@ -101,7 +101,7 @@ class ProductsFrame(tk.Frame):
                                           validatecommand=(self.register(helpers.is_digit), "%P"), )
         self.pcs_per_box_entry.grid(row=6, column=1, padx=5, pady=(0, 10), sticky=tk.EW)
 
-        tk.Label(product_entry_frame, text="একক", bg="#2c3e50", width=5, fg="white",
+        tk.Label(product_entry_frame, text="বিক্রয় একক", bg="#2c3e50", width=5, fg="white",
                  font=("Segoe UI", 12), ).grid(row=7, column=0, padx=5, sticky=tk.NSEW)
 
         self.product_sell_unit_combobox = ttk.Combobox(
@@ -267,6 +267,7 @@ class ProductsFrame(tk.Frame):
             self.product_list_treeview.item(row_id, values=values)
 
         entry.bind("<Return>", lambda e: save_edit())
+        entry.bind("<FocusOut>", lambda e: save_edit())
 
 
     def refresh(self):

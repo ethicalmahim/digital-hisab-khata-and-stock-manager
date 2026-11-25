@@ -379,7 +379,7 @@ class NewPurchase(tk.Frame):
             else:
                 values[col_index] = new_val
 
-            values[SUBTOTAL_COL_INDEX] = str(float(values[QTY_COL_INDEX]) * float(values[RATE_COL_INDEX]))
+            values[SUBTOTAL_COL_INDEX] = str(round(float(values[QTY_COL_INDEX]) * float(values[RATE_COL_INDEX]), 2))
             self.product_entry_treeview.item(row_id, values=values)
             entry.destroy()
             self.update_calculation()
@@ -680,27 +680,18 @@ class RefundFrame:
 
             # Update product stock in the database
             product_code, returned_quantity = values[CODE_COL_INDEX], values[RETURNED_QTY_N_COL_INDEX]
-            self.dbmanager.adjust_stock_of_product(product_code, int(returned_quantity))
+            self.dbmanager.adjust_stock_of_product(product_code, float(returned_quantity))
 
             # Add refund history to the SaleItem
             purchase_item = self.dbmanager.get_purchaseitem(row_id)
             purchase_refund_history = self.dbmanager.PurchaseRefund(
                 refund_quantity=returned_quantity,
-                refund_amount=purchase_item.unit_price * int(returned_quantity),
+                refund_amount=purchase_item.unit_price * float(returned_quantity),
             )
             purchase_item.refunds.append(purchase_refund_history)
 
             self.dbmanager.update_changes()
 
-        total_refund = self.total_refund_amount.get()
-        self.purchase.supplier.balance += total_refund
-        self.purchase.paid += total_refund
-        self.purchase.due -= total_refund
-        statement = self.dbmanager.SupplierStatement(supplier_id=self.purchase.supplier_id,
-                                                     description=f"পণ্য ফেরত (ক্রয় চালান - {self.purchase.id})",
-                                                     amount=self.total_refund_amount.get(),
-                                                     balance=self.purchase.supplier.balance)
-        self.dbmanager.add_statement(statement)
         self.parent.destroy()
 
 

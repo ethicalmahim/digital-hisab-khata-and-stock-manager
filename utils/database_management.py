@@ -9,9 +9,9 @@ session = Session(engine)
 
 
 # Add Walk-in Customer Initially
-walk_in_customer = Customer(name="Walk-in Customer", phone="01700000000", address="Local")
-session.add(walk_in_customer)
-session.commit()
+# walk_in_customer = Customer(name="Walk-in Customer", phone="01700000000", address="Local")
+# session.add(walk_in_customer)
+# session.commit()
 
 
 # ------------------------------------------Functions------------------------------------------
@@ -56,7 +56,7 @@ def adjust_stock_of_product(product_id, quantity):
 
 def update_stock_of_product(product_id, new_stock):
     product = session.get(Product, int(product_id))
-    product.current_stock += int(new_stock)
+    product.current_stock += float(new_stock)
     session.commit()
 
 

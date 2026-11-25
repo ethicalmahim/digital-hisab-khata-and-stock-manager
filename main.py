@@ -99,6 +99,7 @@ class App(tk.Tk):
             frame.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.show_frame("dashboard")
+        self.iconbitmap("img/icon.ico")
 
     def show_frame(self, name):
         self.frames[name].tkraise()

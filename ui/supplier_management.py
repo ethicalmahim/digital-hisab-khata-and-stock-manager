@@ -52,7 +52,7 @@ class SupplierStatementFrame:
 
         scrollbar = ttk.Scrollbar(supplier_statement_frame, orient=tk.VERTICAL,
                                   command=self.statement_treeview.yview)
-        scrollbar.grid(row=2, column=3, sticky=tk.NS, pady=20)
+        scrollbar.grid(row=1, column=3, sticky=tk.NS, pady=20)
         self.statement_treeview.configure(yscrollcommand=scrollbar.set)
 
         self.load_customer_statement()

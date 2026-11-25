@@ -1,15 +1,19 @@
 import math
+import os
 import sqlite3
 import tkinter as tk
 import win32print
 import win32ui
 import textwrap
 
-SHOP_NAME = "দোকানের নাম"
-SHOP_ADDRESS_1 = "দোকানের ঠিকানা ১"
-SHOP_ADDRESS_2 = "দোকানের ঠিকানা ২"
-SHOP_ADDRESS_3 = "দোকানের ঠিকানা ৩"
-SHOP_PHONE = "মোবাইল: 01714963360, 01713566434"
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SHOP_NAME = os.getenv("SHOP_NAME")
+SHOP_ADDRESS_1 = os.getenv("SHOP_ADDRESS_1")
+SHOP_ADDRESS_2 = os.getenv("SHOP_ADDRESS_2")
+SHOP_PHONE = os.getenv("SHOP_PHONE")
 INVOICE_WIDTH = 43
 ITEM_WIDTH = 13
 QTY_WIDTH = 9
@@ -35,7 +39,6 @@ def make_invoice_for_sale(invoice):
     ready_invoice += f"{SHOP_NAME.center(INVOICE_WIDTH)}\n"
     ready_invoice += f"{SHOP_ADDRESS_1.center(INVOICE_WIDTH)}\n"
     ready_invoice += f"{SHOP_ADDRESS_2.center(INVOICE_WIDTH)}\n"
-    ready_invoice += f"{SHOP_ADDRESS_3.center(INVOICE_WIDTH)}\n"
     ready_invoice += f"{SHOP_PHONE.center(INVOICE_WIDTH)}\n"
     ready_invoice += f"{"বিক্রয় চালান".center(INVOICE_WIDTH)}\n"
     ready_invoice += "=" * INVOICE_WIDTH + "\n"
@@ -47,7 +50,7 @@ def make_invoice_for_sale(invoice):
         RATE_WIDTH) + "মজুদ পরি:".ljust(BASE_QTY_WIDTH) + "মোট".rjust(SUBTOTAL) + "\n"
 
     for sl, item in enumerate(invoice.items):
-        name_lines = wrap(item.product_name, ITEM_WIDTH - 1)
+        name_lines = wrap(item.product_name, ITEM_WIDTH - 2)
         qty_lines = [str(round(item.quantity, 2)), item.unit_type]
         base_lines = item.base_qty.split(" ")
         max_lines = max(len(name_lines), len(qty_lines), len(base_lines), 1)
@@ -59,32 +62,32 @@ def make_invoice_for_sale(invoice):
             base = base_lines[i] if i < len(base_lines) else ""
             subtotal = money(item.subtotal) if i == 0 else ""
 
-            row = item_name.ljust(ITEM_WIDTH - 1) + qty.ljust(QTY_WIDTH - 1) + rate.ljust(RATE_WIDTH + 1) + base.ljust(
-                BASE_QTY_WIDTH) + subtotal.rjust(SUBTOTAL + 2) + "\n"
+            row = item_name.ljust(ITEM_WIDTH - 1) + qty.ljust(QTY_WIDTH - 2) + rate.ljust(RATE_WIDTH + 1) + base.ljust(
+                BASE_QTY_WIDTH + 1) + subtotal.rjust(SUBTOTAL + 4) + "\n"
 
             ready_invoice += row
 
         ready_invoice += "\n"
 
     ready_invoice += "-" * INVOICE_WIDTH + "\n"
-    ready_invoice += "সর্বমোট:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.mrp_total}".rjust(
-        INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "সর্বমোট:".rjust(INVOICE_WIDTH // 2 + 2) + f"{invoice.mrp_total}".rjust(
+        INVOICE_WIDTH // 2) + "\n"
     ready_invoice += "(-) ছাড়:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.discount}".rjust(
-        INVOICE_WIDTH // 2 - 1) + "\n"
+        INVOICE_WIDTH // 2) + "\n"
     ready_invoice += f"{"-" * int(INVOICE_WIDTH // 2 - 1)}".rjust(INVOICE_WIDTH) + "\n"
-    ready_invoice += "মোট প্রদেয়:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.total_payable}".rjust(
-        INVOICE_WIDTH // 2 - 1) + "\n"
-    ready_invoice += "পরিশোধ:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.paid}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "মোট প্রদেয়:".rjust(INVOICE_WIDTH // 2 + 2) + f"{invoice.total_payable}".rjust(
+        INVOICE_WIDTH // 2) + "\n"
+    ready_invoice += "পরিশোধ:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.paid}".rjust(INVOICE_WIDTH // 2) + "\n"
     ready_invoice += f"{"-" * int(INVOICE_WIDTH // 2 - 1)}".rjust(INVOICE_WIDTH) + "\n"
     ready_invoice += "ফেরত:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.change}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
-    ready_invoice += "বাকী:".rjust(INVOICE_WIDTH // 2 + 1) + f"{invoice.due}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
+    ready_invoice += "বাকী:".rjust(INVOICE_WIDTH // 2 + 2) + f"{invoice.due}".rjust(INVOICE_WIDTH // 2 - 1) + "\n"
     ready_invoice += "-" * INVOICE_WIDTH + "\n\n"
     ready_invoice += f"গ্রাহকের মোবাইল নম্বর: {invoice.customer.phone}\n"
     ready_invoice += f"গ্রাহকের নাম: {invoice.customer.name}\n"
-    ready_invoice += f"গ্রাহকের ঠিকানা: {invoice.customer.address}\n"
+    ready_invoice += f"গ্রাহকের ঠিকানা: {invoice.customer.address.strip()}\n"
     ready_invoice += f"গ্রাহকের ব্যালেন্স: {invoice.customer.balance if invoice.customer.phone != "01700000000" else ""}\n\n"
     ready_invoice += "ধন্যবাদ, আবার আসবেন। ".center(INVOICE_WIDTH) + "\n\n"
-    ready_invoice += "   বিঃ দ্রঃ পণ্য ফেরতের জন্য রিসিপ্ট আবশ্যক।".center(INVOICE_WIDTH)
+    ready_invoice += "  বিঃ দ্রঃ পণ্য ফেরতের জন্য বিক্রয় চালান আবশ্যক।".center(INVOICE_WIDTH)
 
     return ready_invoice
 

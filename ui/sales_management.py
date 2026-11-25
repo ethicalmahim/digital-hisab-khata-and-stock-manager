@@ -432,7 +432,7 @@ class NewSaleFrame(tk.Frame):
             else:
                 values[col_index] = new_val
 
-            values[SUBTOTAL_COL_INDEX] = str(float(values[QTY_COL_INDEX]) * float(values[RATE_COL_INDEX]))
+            values[SUBTOTAL_COL_INDEX] = str(round(float(values[QTY_COL_INDEX]) * float(values[RATE_COL_INDEX]), 2))
             self.product_entry_treeview.item(row_id, values=values)
 
             entry.destroy()
@@ -710,6 +710,7 @@ class NewSaleFrame(tk.Frame):
         self.invoice_call_entry.config(state=tk.NORMAL)  # Make invoice call entry normal before refresh
         self.refresh()
 
+
     def refresh(self):
         # Clear Search Entry + Set Quantity 1
         self.product_name_search_entry.delete(0, tk.END)
@@ -923,7 +924,7 @@ class RefundFrame:
             values[col_index] = new_val  # Implements Changes
 
             # Update return subtotal
-            values[REFUND_AMT_COL_INDEX] = str(float(values[RF_RATE_COL_INDEX]) * float(values[col_index]))
+            values[REFUND_AMT_COL_INDEX] = str(round(float(values[RF_RATE_COL_INDEX]) * float(values[col_index]), 2))
             # Update Product in the TreeView
             self.product_entry_treeview.item(row_id, values=values)
 
@@ -950,7 +951,7 @@ class RefundFrame:
             saleitem = self.dbmanager.get_saleitem(row_id)
             refund_history = self.dbmanager.Refund(
                 refund_quantity=returned_quantity,
-                refund_amount=saleitem.unit_price * int(returned_quantity),
+                refund_amount=saleitem.unit_price * float(returned_quantity),
             )
             saleitem.refunds.append(refund_history)
             self.dbmanager.update_changes()
@@ -1100,6 +1101,7 @@ class SalesFrame(tk.Frame):
 
         self.all_radio_button.invoke()
 
+
     def all_sales(self):
         self.disable_search_mechanism()
         self.sales_treeview.delete(*self.sales_treeview.get_children())
@@ -1240,6 +1242,7 @@ class SalesFrame(tk.Frame):
 
                 self.dbmanager.add_customer_due_payment_history(customer_due_payment_history)
                 self.dbmanager.update_changes()
+                # payment_win.grab_release()
                 payment_win.destroy()
                 self.refresh()
 
@@ -1319,7 +1322,6 @@ class SalesFrame(tk.Frame):
         self.dbmanager.delete_invoice(invoice)
         self.refresh()
         messagebox.showinfo(title="সফল", message="চালানটি সফলভাবে মুছা হয়েছে !")
-
 
     def due_payment_history(self):
         selected_invoice_iid = self.sales_treeview.selection()[0]
