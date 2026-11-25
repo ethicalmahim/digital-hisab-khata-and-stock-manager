@@ -101,6 +101,9 @@ digital-hisab-khata-and-stock-manager/
 │   ├── dbmodels.py              # SQLAlchemy ORM models (13 tables)
 │   ├── database_management.py   # Engine, session & data-access functions
 │   └── helpers.py               # Invoice builder, printing, validators, autocomplete, unit conversion
+├── scripts/
+│   └── seed_demo_data.py        # Fills the database with fictional demo data
+├── screenshots/                 # README screenshots
 ├── img/                         # App icon
 ├── database/                    # SQLite database file is created here on first run (git-ignored)
 ├── .env.example                 # Shop details template for invoices
@@ -132,13 +135,13 @@ Expense
 - Windows 10 / 11
 - Python **3.12 or newer** (the code uses nested same-quote f-strings from PEP 701)
 - A Bangla-capable font (Windows ships with *Nirmala UI*, which works)
-- *(Optional)* A thermal receipt printer set as the default printer, and a USB barcode scanner
+- *(Optional)* A thermal receipt printer set as the default printer
 
 ### Installation
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/mahim02580/digital-hisab-khata-and-stock-manager.git
+git clone https://github.com/ethicalmahim/digital-hisab-khata-and-stock-manager.git
 cd digital-hisab-khata-and-stock-manager
 
 # 2. Create and activate a virtual environment
@@ -187,31 +190,12 @@ The app opens maximised on the dashboard. All tables are created automatically o
 
 Most tables have a **right-click context menu** for actions such as refresh, edit, delete, receive payment, return and view statement.
 
-## 🧠 What I learned / highlights
-
-- Designing a **relational schema** for a real business: invoices, line items, partial payments, refunds and running-balance ledgers
-- Using **SQLAlchemy 2.0** typed ORM models and relationships in a desktop app
-- Building a multi-screen **Tkinter** app with frame-based navigation, editable `Treeview` tables, popups and context menus
-- Writing a custom **autocomplete widget** that also handles barcode scanner input
-- Formatting and **printing receipts** directly through the Windows GDI API
-- Turning domain rules (tiles by sft, box and piece; pipes by length) into reliable **unit-conversion logic**
-- Building a **fully localised (Bangla) UI** for non-technical users
-
-## 🗺️ Roadmap
-
-- [ ] Low-stock alert view / notifications
-- [ ] Reports & charts (monthly sales, profit trends)
-- [ ] Export to Excel / PDF
-- [ ] Data backup & restore
-- [ ] User login and roles (owner / staff)
-- [ ] Packaged `.exe` installer (PyInstaller)
-
 ## 🤝 Contributing
 
 Suggestions and pull requests are welcome. For a large change, please open an issue first so we can discuss it.
 
 ## 📬 Contact
 
-**Mahim**, GitHub: [@mahim02580](https://github.com/mahim02580)
+**Ethical Mahim**, GitHub: [@ethicalmahim](https://github.com/ethicalmahim)
 
 If you find this project interesting, consider giving it a ⭐!
