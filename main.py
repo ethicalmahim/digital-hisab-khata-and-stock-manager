@@ -1,3 +1,19 @@
+import os
+import sys
+
+# When running as a PyInstaller exe, use the exe's folder as the working directory
+# so database/ and .env are read from (and stored next to) the exe.
+if getattr(sys, "frozen", False):
+    os.chdir(os.path.dirname(sys.executable))
+os.makedirs("database", exist_ok=True)
+
+
+def resource_path(relative_path):
+    """Path to a bundled resource (works for both source and PyInstaller exe)."""
+    base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, relative_path)
+
+
 import tkinter as tk
 from tkinter import ttk
 from ui.dashboard import DashboardFrame
@@ -98,7 +114,7 @@ class App(tk.Tk):
             frame.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.show_frame("dashboard")
-        self.iconbitmap("img/icon.ico")
+        self.iconbitmap(resource_path("img/icon.ico"))
 
     def show_frame(self, name):
         self.frames[name].tkraise()
