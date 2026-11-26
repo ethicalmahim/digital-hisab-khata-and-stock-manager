@@ -72,6 +72,28 @@ Live summary cards (right-click to refresh):
 - Record daily shop expenses (purpose + amount)
 - View today's, all, or a specific date's expenses, with inline editing and deletion
 
+## 📸 Screenshots
+
+**Dashboard (ড্যাশবোর্ড)**: the day's sales, dues, purchases, expenses and profit at a glance
+
+![Dashboard](screenshots/dashboard.png)
+
+| New sale (নতুন বিক্রয়) | Sales history and receipt (বিক্রয়সমূহ) |
+|---|---|
+| ![New sale](screenshots/new-sale.png) | ![Sales history with a printed receipt preview](screenshots/sales-history.png) |
+
+| New purchase (নতুন ক্রয়) | Purchases (ক্রয়সমূহ) |
+|---|---|
+| ![New purchase](screenshots/new-purchase.png) | ![Purchases](screenshots/purchases.png) |
+
+| Products and stock (পণ্যসমূহ) | Expenses (খরচসমূহ) |
+|---|---|
+| ![Products and stock](screenshots/products.png) | ![Expenses](screenshots/expenses.png) |
+
+| Customers (গ্রাহক) | Suppliers (সাপ্লায়ার) |
+|---|---|
+| ![Customers](screenshots/customers.png) | ![Suppliers](screenshots/suppliers.png) |
+
 ## 🛠️ Tech stack
 
 | Layer | Technology |
