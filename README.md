@@ -3,7 +3,6 @@
 <img src="img/icon.png" alt="Digital Hisab Khata logo" width="110" />
 
 # Digital Hisab Khata & Stock Manager
-### ডিজিটাল হিসাব খাতা ও স্টক ম্যানেজার
 
 **A Bangla-language desktop point-of-sale, accounting and inventory app for small retail shops.**
 
